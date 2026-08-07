@@ -53,26 +53,34 @@ public interface GatePassRepository extends MongoRepository<GatePass, String> {
                 .orElse(1000);
     }
 
-    /** Combined search + date filter. */
+    /** Combined search + date filter across Party Name, Village Name, Vehicle Number, and Pass No. */
     default List<GatePass> search(String q, String date) {
         boolean hasQ = q != null && !q.isBlank();
         boolean hasDate = date != null && !date.isBlank();
 
+        List<GatePass> allPasses = findAllByOrderByCreatedAtDesc();
+
         if (!hasQ && !hasDate) {
-            return findAllByOrderByCreatedAtDesc();
-        } else if (hasQ && !hasDate) {
-            return findByPartyNameContainingIgnoreCaseOrVehicleNumberContainingIgnoreCaseOrderByCreatedAtDesc(q.trim(), q.trim());
-        } else if (!hasQ && hasDate) {
-            return findByDateOrderByCreatedAtDesc(date.trim());
-        } else {
-            String targetQ = q.trim().toLowerCase();
-            String targetDate = date.trim();
-            return findAllByOrderByCreatedAtDesc().stream()
-                    .filter(g -> (g.getPartyName() != null && g.getPartyName().toLowerCase().contains(targetQ)) ||
-                                 (g.getVehicleNumber() != null && g.getVehicleNumber().toLowerCase().contains(targetQ)))
-                    .filter(g -> targetDate.equalsIgnoreCase(g.getDate()))
-                    .toList();
+            return allPasses;
         }
+
+        String targetQ = hasQ ? q.trim().toLowerCase().replace("#", "") : "";
+        String targetDate = hasDate ? date.trim() : "";
+
+        return allPasses.stream()
+                .filter(g -> {
+                    if (!hasQ) return true;
+                    boolean matchParty = g.getPartyName() != null && g.getPartyName().toLowerCase().contains(targetQ);
+                    boolean matchVillage = g.getVillageName() != null && g.getVillageName().toLowerCase().contains(targetQ);
+                    boolean matchVehicle = g.getVehicleNumber() != null && g.getVehicleNumber().toLowerCase().contains(targetQ);
+                    boolean matchPassNo = g.getPassNo() != null && String.valueOf(g.getPassNo()).contains(targetQ);
+                    return matchParty || matchVillage || matchVehicle || matchPassNo;
+                })
+                .filter(g -> {
+                    if (!hasDate) return true;
+                    return targetDate.equalsIgnoreCase(g.getDate());
+                })
+                .toList();
     }
 
     /** Count passes in a specific month + year for dashboard stats. */
