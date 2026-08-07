@@ -374,7 +374,9 @@ export const Dashboard: React.FC = () => {
                 </button>
 
                 {isFilterOpen && (
-                  <div className="calendar-popover two-panel">
+                  <>
+                    <div className="filter-popover-backdrop" onClick={() => setIsFilterOpen(false)} />
+                    <div className="calendar-popover two-panel">
                     {/* Left Presets Panel — NO "Last Year" */}
                     <div className="popover-left-panel">
                       {(['Last Week', 'Last Month', 'Custom'] as const).map(preset => (
@@ -457,7 +459,8 @@ export const Dashboard: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                )}
+                </>
+              )}
               </div>
             </div>
 

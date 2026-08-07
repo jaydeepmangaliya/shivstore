@@ -196,3 +196,33 @@
   font-weight: 800;
   box-shadow: 0 4px 12px rgba(92, 96, 245, 0.3);
 }
+
+/* ── Mobile Responsiveness ─────────────────────────────────────────────── */
+.cdp-backdrop {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .cdp-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 18, 35, 0.5);
+    backdrop-filter: blur(3px);
+    z-index: 999990;
+  }
+
+  .cdp-popover {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 90vw !important;
+    max-width: 320px !important;
+    box-shadow: 0 20px 60px rgba(9, 13, 34, 0.4) !important;
+    z-index: 999999 !important;
+    border-radius: 20px !important;
+    padding: 20px !important;
+    box-sizing: border-box !important;
+  }
+}

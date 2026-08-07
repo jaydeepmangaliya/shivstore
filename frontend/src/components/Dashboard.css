@@ -1463,3 +1463,79 @@ body {
     gap: 10px;
   }
 }
+
+/* ── Dashboard Filter Calendar Mobile Responsiveness ─────────────────── */
+.filter-popover-backdrop {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .filter-popover-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 18, 35, 0.5);
+    backdrop-filter: blur(3px);
+    z-index: 1090;
+  }
+
+  .calendar-popover.two-panel {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 92vw !important;
+    max-width: 350px !important;
+    min-width: 0 !important;
+    flex-direction: column !important;
+    max-height: 88vh !important;
+    overflow-y: auto !important;
+    box-shadow: 0 20px 60px rgba(9, 13, 34, 0.4) !important;
+    border-radius: 20px !important;
+    z-index: 1100 !important;
+  }
+
+  .popover-left-panel {
+    width: 100% !important;
+    min-width: 100% !important;
+    border-right: none !important;
+    border-bottom: 1px solid #eaecf4 !important;
+    padding: 14px 16px !important;
+    box-sizing: border-box !important;
+  }
+
+  .popover-right-panel {
+    width: 100% !important;
+    min-width: 100% !important;
+    padding: 16px 14px !important;
+    box-sizing: border-box !important;
+  }
+
+  .calendar-weekdays {
+    display: grid !important;
+    grid-template-columns: repeat(7, 1fr) !important;
+    width: 100% !important;
+    text-align: center !important;
+    margin-bottom: 8px !important;
+    box-sizing: border-box !important;
+  }
+
+  .calendar-weekdays span {
+    display: block !important;
+    text-align: center !important;
+  }
+
+  .calendar-grid-cells {
+    display: grid !important;
+    grid-template-columns: repeat(7, 1fr) !important;
+    width: 100% !important;
+    gap: 4px !important;
+    box-sizing: border-box !important;
+  }
+
+  .calendar-cell {
+    height: 38px !important;
+    width: 100% !important;
+    font-size: 13px !important;
+  }
+}

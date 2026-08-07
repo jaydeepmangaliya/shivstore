@@ -136,7 +136,9 @@ export const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
       </button>
 
       {isOpen && (
-        <div className="cdp-popover">
+        <>
+          <div className="cdp-backdrop" onClick={() => setIsOpen(false)} />
+          <div className="cdp-popover">
           {/* Header Month/Year Nav */}
           <div className="cdp-header">
             <button
@@ -189,6 +191,7 @@ export const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
             })}
           </div>
         </div>
+        </>
       )}
     </div>
   );
