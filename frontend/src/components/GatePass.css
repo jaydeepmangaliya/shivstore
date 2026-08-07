@@ -823,12 +823,32 @@
     padding: 20px 16px;
   }
 
+  .users-modal-body {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    padding: 12px !important;
+  }
+
   .users-modal-body .gp-page.gp-modal-layout {
-    flex-direction: column;
-    overflow-y: auto;
+    flex-direction: column-reverse;
+    overflow-y: visible;
+    height: auto;
+    gap: 16px;
+  }
+
+  .users-modal-body .gp-page.gp-modal-layout .gp-form-panel {
+    width: 100%;
+    height: auto;
+    overflow-y: visible;
+    padding: 20px 16px;
+    border-radius: 14px;
   }
 
   .users-modal-body .gp-page.gp-modal-layout .gp-preview-panel {
-    min-width: 100%;
+    width: 100%;
+    min-width: 0;
+    height: auto;
+    overflow-y: visible;
+    display: none; /* Hide redundant inline receipt on mobile modal to keep edit form ultra clean */
   }
 }

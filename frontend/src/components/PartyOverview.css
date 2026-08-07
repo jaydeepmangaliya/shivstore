@@ -146,6 +146,8 @@
 .po-bill-preview-wrapper {
   flex: 1;
   overflow-y: auto;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   padding: 24px;
   background: #f1f5f9;
 }
@@ -159,6 +161,53 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   max-width: 800px;
   margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* Special styling forced during HTML-to-PDF export on mobile & desktop */
+.po-bill-card.rendering-pdf {
+  width: 800px !important;
+  max-width: none !important;
+  padding: 36px 40px !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background: #ffffff !important;
+}
+
+.po-bill-card.rendering-pdf .po-bill-company {
+  font-size: 26px !important;
+}
+
+.po-bill-card.rendering-pdf .po-bill-meta-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 12px 24px !important;
+  padding: 16px 22px !important;
+}
+
+.po-bill-card.rendering-pdf .po-bill-summary-bar {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  text-align: left !important;
+  gap: 0 !important;
+  padding: 16px 24px !important;
+}
+
+.po-bill-card.rendering-pdf .po-bill-signatures {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-between !important;
+  gap: 20px !important;
+  padding-top: 20px !important;
+}
+
+.po-bill-card.rendering-pdf .po-bill-sig-col {
+  min-width: 180px !important;
+  width: auto !important;
 }
 
 .po-bill-top-header {

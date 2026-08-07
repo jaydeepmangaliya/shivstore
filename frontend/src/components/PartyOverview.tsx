@@ -301,30 +301,40 @@ export const PartyOverview: React.FC = () => {
     }));
   }, [billRecords]);
 
-  // Optimized PDF export: compressed JPEG + jsPDF compress = ~75 KB size instead of 6.4 MB!
+  // Optimized PDF export: forces 800px A4 desktop layout during capture on any screen (mobile/desktop)
   const handleExportBillPDF = async () => {
     if (!billPrintRef.current) return;
     setIsExportingBill(true);
+    const element = billPrintRef.current;
     try {
-      const canvas = await html2canvas(billPrintRef.current, {
-        scale: 1.5,
+      // Add class to enforce fixed 800px A4 print styling during html2canvas capture
+      element.classList.add('rendering-pdf');
+
+      const canvas = await html2canvas(element, {
+        scale: 2,
         useCORS: true,
-        backgroundColor: '#ffffff'
+        backgroundColor: '#ffffff',
+        windowWidth: 1200, // Forces html2canvas to render desktop media query layout
+        logging: false,
       });
-      const imgData = canvas.toDataURL('image/jpeg', 0.65);
+
+      element.classList.remove('rendering-pdf');
+
+      const imgData = canvas.toDataURL('image/jpeg', 0.92);
       const pdf = new jsPDF({
-        orientation: 'p',
+        orientation: 'portrait',
         unit: 'mm',
         format: 'a4',
         compress: true
       });
-      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfWidth = pdf.internal.pageSize.getWidth(); // 210mm
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
       pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
       pdf.save(`Statement_${decodedName.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.pdf`);
     } catch (err) {
       console.error('Error generating statement PDF:', err);
     } finally {
+      element.classList.remove('rendering-pdf');
       setIsExportingBill(false);
     }
   };

@@ -278,14 +278,17 @@ const GatePassForm: React.FC<GatePassFormProps> = ({ initialRecord, onSaved, hid
   const exportPDF = async (ref: React.RefObject<HTMLDivElement | null>) => {
     if (!ref.current || !saved) return;
     setExporting(true);
+    const element = ref.current;
     try {
-      const element = ref.current;
+      element.classList.add('rendering-pdf');
       const canvas = await html2canvas(element, {
         scale: 2, // 2x scale for 300 DPI crispness at ~120KB
         useCORS: true,
         backgroundColor: '#ffffff',
+        windowWidth: 1000,
         logging: false,
       });
+      element.classList.remove('rendering-pdf');
 
       const imgData = canvas.toDataURL('image/jpeg', 0.92);
 
@@ -304,6 +307,7 @@ const GatePassForm: React.FC<GatePassFormProps> = ({ initialRecord, onSaved, hid
     } catch (err) {
       console.error('Export PDF error:', err);
     } finally {
+      element.classList.remove('rendering-pdf');
       setExporting(false);
     }
   };
