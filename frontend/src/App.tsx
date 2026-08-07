@@ -8,6 +8,7 @@ import { Dashboard } from './components/Dashboard';
 import { Forms } from './components/Forms';
 import { Users } from './components/Users';
 import { PartyOverview } from './components/PartyOverview';
+import { VehicleOverview } from './components/VehicleOverview';
 import { isAuthenticated } from './services/api';
 
 /**
@@ -45,6 +46,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Users />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/vehicles"
+          element={
+            <ProtectedRoute>
+              <VehicleOverview />
             </ProtectedRoute>
           }
         />

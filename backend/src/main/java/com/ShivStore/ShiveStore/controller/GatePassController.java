@@ -2,6 +2,7 @@ package com.ShivStore.ShiveStore.controller;
 
 import com.ShivStore.ShiveStore.dto.GatePassRequestDTO;
 import com.ShivStore.ShiveStore.dto.GatePassResponseDTO;
+import com.ShivStore.ShiveStore.dto.VehicleSummaryDTO;
 import com.ShivStore.ShiveStore.service.GatePassService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -114,7 +115,19 @@ public class GatePassController {
         return ResponseEntity.ok(Map.of("nextPassNo", gatePassService.getNextPassNo()));
     }
 
-    // ─── BULK DELETE BY PARTY ─────────────────────────────────────────────────
+    // ─── VEHICLE SUMMARY ANALYTICS ───────────────────────────────────────────
+
+    /**
+     * GET /api/gatepasses/vehicles/summary?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD&q=...
+     * Returns vehicle-wise transport summaries.
+     */
+    @GetMapping("/vehicles/summary")
+    public ResponseEntity<List<VehicleSummaryDTO>> getVehicleSummaries(
+            @RequestParam(required = false, defaultValue = "") String startDate,
+            @RequestParam(required = false, defaultValue = "") String endDate,
+            @RequestParam(required = false, defaultValue = "") String q) {
+        return ResponseEntity.ok(gatePassService.getVehicleSummaries(startDate, endDate, q));
+    }
 
     /**
      * GET /api/gatepasses/by-party/count?partyName=X&startDate=DD/MM/YYYY&endDate=DD/MM/YYYY

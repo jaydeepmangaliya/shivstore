@@ -2,6 +2,7 @@ package com.ShivStore.ShiveStore.service;
 
 import com.ShivStore.ShiveStore.dto.GatePassRequestDTO;
 import com.ShivStore.ShiveStore.dto.GatePassResponseDTO;
+import com.ShivStore.ShiveStore.dto.VehicleSummaryDTO;
 
 import java.util.List;
 
@@ -57,4 +58,7 @@ public interface GatePassService {
 
     /** Bulk delete all gate passes for a party with optional date filter. */
     int deleteByParty(String partyName, String startDate, String endDate);
+
+    /** Get aggregated transport summary per vehicle with optional date range and search query. */
+    List<VehicleSummaryDTO> getVehicleSummaries(String startDate, String endDate, String q);
 }

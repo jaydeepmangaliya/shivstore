@@ -351,3 +351,30 @@ export async function fetchDashboardStats(): Promise<DashboardStats> {
   if (!res.ok) throw new Error(`Failed to fetch dashboard stats: ${res.statusText}`);
   return res.json();
 }
+
+// ── Vehicle Analytics API calls ───────────────────────────────────────────
+
+export interface VehicleSummaryDTO {
+  vehicleNumber: string;
+  totalTrips: number;
+  totalWeightKg: number;
+  totalTons: number;
+  lastDispatchDate: string;
+  materialBreakdownTons: Record<string, number>;
+  recentDispatches: GatePassDTO[];
+}
+
+export async function fetchVehicleSummaries(
+  startDate: string = '',
+  endDate: string = '',
+  q: string = ''
+): Promise<VehicleSummaryDTO[]> {
+  const params = new URLSearchParams();
+  if (startDate) params.append('startDate', startDate);
+  if (endDate) params.append('endDate', endDate);
+  if (q) params.append('q', q);
+
+  const res = await apiFetch(`${API_BASE}/gatepasses/vehicles/summary?${params.toString()}`);
+  if (!res.ok) throw new Error(`Failed to fetch vehicle summaries: ${res.statusText}`);
+  return res.json();
+}

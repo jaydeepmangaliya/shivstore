@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, User, FileText, LogOut } from 'lucide-react';
+import { LayoutDashboard, User, FileText, LogOut, Truck } from 'lucide-react';
 import GatePassForm from './GatePassForm';
 import './Forms.css';
 import './Dashboard.css';
@@ -55,6 +55,10 @@ export const Forms: React.FC = () => {
               <li className="menu-item" onClick={() => navigate('/users')}>
                 <User size={20} />
                 <span>Users</span>
+              </li>
+              <li className="menu-item" onClick={() => navigate('/vehicles')}>
+                <Truck size={20} />
+                <span>Vehicles</span>
               </li>
               <li className="menu-item active">
                 <FileText size={20} />

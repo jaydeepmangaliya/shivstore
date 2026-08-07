@@ -367,9 +367,13 @@ export const PartyOverview: React.FC = () => {
                 <LayoutDashboard size={20} />
                 <span>Dashboard</span>
               </li>
-              <li className="menu-item active" onClick={() => navigate('/users')}>
+              <li className="menu-item" onClick={() => navigate('/users')}>
                 <User size={20} />
                 <span>Users</span>
+              </li>
+              <li className="menu-item" onClick={() => navigate('/vehicles')}>
+                <Truck size={20} />
+                <span>Vehicles</span>
               </li>
               <li className="menu-item" onClick={() => navigate('/forms')}>
                 <FileText size={20} />

@@ -9,7 +9,8 @@ import {
   X,
   PlusCircle,
   LogOut,
-  Trash2
+  Trash2,
+  Truck
 } from 'lucide-react';
 import { fetchGatePasses, deleteGatePass } from '../services/api';
 import GatePassForm from './GatePassForm';
@@ -174,6 +175,10 @@ export const Users: React.FC = () => {
               <li className="menu-item active">
                 <User size={20} />
                 <span>Users</span>
+              </li>
+              <li className="menu-item" onClick={() => navigate('/vehicles')}>
+                <Truck size={20} />
+                <span>Vehicles</span>
               </li>
               <li className="menu-item" onClick={() => navigate('/forms')}>
                 <FileText size={20} />

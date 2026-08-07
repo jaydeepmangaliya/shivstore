@@ -11,7 +11,8 @@ import {
   FileText,
   TrendingDown,
   LogOut,
-  X
+  X,
+  Truck
 } from 'lucide-react';
 import { fetchDashboardRevenue, fetchDashboardOrders } from '../services/api';
 import './Dashboard.css';
@@ -346,6 +347,10 @@ export const Dashboard: React.FC = () => {
               <li className="menu-item" onClick={() => navigate('/users')}>
                 <User size={20} />
                 <span>Users</span>
+              </li>
+              <li className="menu-item" onClick={() => navigate('/vehicles')}>
+                <Truck size={20} />
+                <span>Vehicles</span>
               </li>
               <li className="menu-item" onClick={() => navigate('/forms')}>
                 <FileText size={20} />

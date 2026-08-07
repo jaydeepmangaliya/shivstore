@@ -2,6 +2,7 @@ package com.ShivStore.ShiveStore.service;
 
 import com.ShivStore.ShiveStore.dto.GatePassRequestDTO;
 import com.ShivStore.ShiveStore.dto.GatePassResponseDTO;
+import com.ShivStore.ShiveStore.dto.VehicleSummaryDTO;
 import com.ShivStore.ShiveStore.model.GatePass;
 import com.ShivStore.ShiveStore.repository.GatePassRepository;
 import org.springframework.stereotype.Service;
@@ -9,8 +10,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * GatePassServiceImpl — Single Responsibility: all gate pass business logic lives here.
@@ -208,6 +209,78 @@ public class GatePassServiceImpl implements GatePassService {
             }
         } catch (Exception ignored) {}
         return null;
+    }
+
+    @Override
+    public List<VehicleSummaryDTO> getVehicleSummaries(String startDate, String endDate, String q) {
+        List<GatePass> allPasses = repository.findAllByOrderByCreatedAtDesc();
+
+        LocalDate start = parseFlexibleDate(startDate);
+        LocalDate end = parseFlexibleDate(endDate);
+        String safeQ = (q != null) ? q.trim().toLowerCase().replace("#", "") : "";
+
+        // Filter by date range and search query
+        List<GatePass> filtered = allPasses.stream().filter(p -> {
+            if (start != null || end != null) {
+                LocalDate passDate = parseFlexibleDate(p.getDate());
+                if (passDate != null) {
+                    if (start != null && passDate.isBefore(start)) return false;
+                    if (end != null && passDate.isAfter(end)) return false;
+                }
+            }
+            if (!safeQ.isBlank()) {
+                boolean matchVehicle = p.getVehicleNumber() != null && p.getVehicleNumber().toLowerCase().contains(safeQ);
+                boolean matchParty = p.getPartyName() != null && p.getPartyName().toLowerCase().contains(safeQ);
+                boolean matchVillage = p.getVillageName() != null && p.getVillageName().toLowerCase().contains(safeQ);
+                boolean matchPassNo = p.getPassNo() != null && String.valueOf(p.getPassNo()).contains(safeQ);
+                return matchVehicle || matchParty || matchVillage || matchPassNo;
+            }
+            return true;
+        }).toList();
+
+        // Group by Vehicle Number
+        Map<String, List<GatePass>> groupedByVehicle = filtered.stream()
+                .filter(p -> p.getVehicleNumber() != null && !p.getVehicleNumber().isBlank())
+                .collect(Collectors.groupingBy(p -> p.getVehicleNumber().trim().toUpperCase()));
+
+        List<VehicleSummaryDTO> result = new ArrayList<>();
+
+        for (Map.Entry<String, List<GatePass>> entry : groupedByVehicle.entrySet()) {
+            String vehicleNo = entry.getKey();
+            List<GatePass> passes = entry.getValue();
+
+            long totalTrips = passes.size();
+            double totalWeightKg = passes.stream().mapToDouble(p -> p.getNetWeight() != null ? p.getNetWeight() : 0.0).sum();
+            double totalTons = Math.round(totalWeightKg / 1000.0 * 100.0) / 100.0;
+            String lastDispatchDate = passes.get(0).getDate();
+
+            Map<String, Double> materialBreakdown = new HashMap<>();
+            for (GatePass p : passes) {
+                String matName = (p.getMaterials() != null && !p.getMaterials().isBlank()) ? p.getMaterials().trim() : "General";
+                double tons = p.getNetTons() != null ? p.getNetTons() : (p.getNetWeight() != null ? p.getNetWeight() / 1000.0 : 0.0);
+                materialBreakdown.put(matName, Math.round((materialBreakdown.getOrDefault(matName, 0.0) + tons) * 100.0) / 100.0);
+            }
+
+            List<GatePassResponseDTO> recentDtos = passes.stream()
+                    .limit(10)
+                    .map(GatePassResponseDTO::from)
+                    .toList();
+
+            result.add(VehicleSummaryDTO.builder()
+                    .vehicleNumber(vehicleNo)
+                    .totalTrips(totalTrips)
+                    .totalWeightKg(totalWeightKg)
+                    .totalTons(totalTons)
+                    .lastDispatchDate(lastDispatchDate)
+                    .materialBreakdownTons(materialBreakdown)
+                    .recentDispatches(recentDtos)
+                    .build());
+        }
+
+        // Sort vehicles by totalTons descending
+        result.sort((a, b) -> Double.compare(b.getTotalTons(), a.getTotalTons()));
+
+        return result;
     }
 
     // ─── PRIVATE HELPERS ──────────────────────────────────────────────────────
