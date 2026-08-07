@@ -6,6 +6,7 @@ spring:
     mongodb:
       # MongoDB Atlas connection URI
       uri: ${SPRING_DATA_MONGODB_URI:mongodb+srv://brandstore111111_db_user:1pLQbJVtQXEY070x@cluster0.b146y9k.mongodb.net/shiv_store_db?retryWrites=true&w=majority}
+      database: shiv_store_db
 
   # Gmail SMTP Configuration for Password Reset Emails
   mail:

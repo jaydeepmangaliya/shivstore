@@ -1,14 +1,14 @@
 package com.ShivStore.ShiveStore;
 
 import com.mongodb.ConnectionString;
-import com.mongodb.MongoClientSettings;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.MongoDatabaseFactory;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 
 @Configuration
 public class MongoConfig {
@@ -24,7 +24,7 @@ public class MongoConfig {
     private String mongodbUri;
 
     @Bean
-    public MongoClient mongoClient() {
+    public MongoDatabaseFactory mongoDatabaseFactory() {
         String finalUri = springDataUri;
         if (finalUri == null || finalUri.isBlank()) {
             finalUri = mongodbUri;
@@ -37,10 +37,23 @@ public class MongoConfig {
         }
 
         ConnectionString connectionString = new ConnectionString(finalUri);
-        MongoClientSettings mongoClientSettings = MongoClientSettings.builder()
-                .applyConnectionString(connectionString)
-                .build();
+        String databaseName = connectionString.getDatabase();
+        if (databaseName == null || databaseName.isBlank()) {
+            databaseName = "shiv_store_db";
+            // Append default database name if missing from URI
+            if (!finalUri.contains("?")) {
+                finalUri = finalUri + "/shiv_store_db";
+            } else {
+                finalUri = finalUri.replace("?", "/shiv_store_db?");
+            }
+        }
 
-        return MongoClients.create(mongoClientSettings);
+        log.info("Initializing MongoDatabaseFactory for database: {}", databaseName);
+        return new SimpleMongoClientDatabaseFactory(finalUri);
+    }
+
+    @Bean
+    public MongoTemplate mongoTemplate(MongoDatabaseFactory mongoDatabaseFactory) {
+        return new MongoTemplate(mongoDatabaseFactory);
     }
 }
