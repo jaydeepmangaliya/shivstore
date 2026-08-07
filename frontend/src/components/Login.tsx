@@ -151,15 +151,9 @@ export const Login: React.FC = () => {
         </div>
       </div>
 
-      {/* Form Panel — Right Side with 3D Glassmorphism Tilt */}
+      {/* Form Panel — Right Side */}
       <div className="auth-form-panel">
-        <div
-          className="auth-card"
-          style={{
-            transform: `perspective(1000px) rotateY(${mousePos.x * 7}deg) rotateX(${-mousePos.y * 7}deg)`,
-            transition: 'transform 0.12s ease-out, box-shadow 0.3s ease',
-          }}
-        >
+        <div className="auth-card">
           {/* Dynamic Specular Light Shine Reflection */}
           <div
             className="auth-card-shine"
