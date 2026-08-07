@@ -503,7 +503,7 @@ export const Dashboard: React.FC = () => {
 
             {/* Bar Chart — Tons */}
             <div className="chart-container bar-chart-container">
-              <svg className="bar-chart-svg" viewBox="0 0 1000 200">
+              <svg className="bar-chart-svg" viewBox="0 0 1000 200" key={`bar-${activeDateRange.startDate}-${activeDateRange.endDate}-${revenueData.length}`}>
                 <line x1="30" y1="30" x2="970" y2="30" stroke="#f1f3f9" strokeWidth="1" />
                 <line x1="30" y1="80" x2="970" y2="80" stroke="#f1f3f9" strokeWidth="1" />
                 <line x1="30" y1="130" x2="970" y2="130" stroke="#f1f3f9" strokeWidth="1" />
@@ -521,13 +521,16 @@ export const Dashboard: React.FC = () => {
                   const h2 = maxBarVal > 0 ? (d.val2 / maxBarVal) * 130 : 0;
                   const y1 = 170 - h1;
                   const y2 = 170 - h2;
+                  const delaySec = (index * 0.03).toFixed(2);
 
                   return (
                     <g key={index} className="bar-group">
                       <rect x={xBase} y={y1} width={barWidth} height={h1} rx="2" fill="#5c60f5"
+                        style={{ animationDelay: `${delaySec}s` }}
                         onMouseEnter={() => setActiveTooltip({ type: 'revenue', index, x: xBase + barWidth / 2, y: y1 - 35 })}
                         onMouseLeave={() => setActiveTooltip(null)} />
                       <rect x={xBase + barWidth + barSpacing} y={y2} width={barWidth} height={h2} rx="2" fill="#e4e6fc"
+                        style={{ animationDelay: `${delaySec}s` }}
                         onMouseEnter={() => setActiveTooltip({ type: 'revenue', index, x: xBase + barWidth + barSpacing + barWidth / 2, y: y2 - 35 })}
                         onMouseLeave={() => setActiveTooltip(null)} />
                       {(totalCount <= 14 || index % 2 === 0) && (
@@ -594,7 +597,7 @@ export const Dashboard: React.FC = () => {
 
             {/* Line Chart — Forms Created */}
             <div className="chart-container line-chart-container">
-              <svg className="line-chart-svg" viewBox="0 0 1050 150">
+              <svg className="line-chart-svg" viewBox="0 0 1050 150" key={`line-${orderYear}-${monthlyOrderData.length}`}>
                 {/* Y-axis ticks */}
                 {formTicks.map((tick, i) => {
                   const ty = getTickY(i / 4);
@@ -609,11 +612,13 @@ export const Dashboard: React.FC = () => {
 
                 {/* Previous year line */}
                 <path
+                  className="animated-line line-previous"
                   d={monthlyOrderData.map((d, i) => { const x = 60 + i * (950 / 11); return `${i === 0 ? 'M' : 'L'} ${x} ${getFormY(d.previous)}`; }).join(' ')}
                   fill="none" stroke="#cdd1fd" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
 
                 {/* Current year line */}
                 <path
+                  className="animated-line line-current"
                   d={monthlyOrderData.map((d, i) => { const x = 60 + i * (950 / 11); return `${i === 0 ? 'M' : 'L'} ${x} ${getFormY(d.current)}`; }).join(' ')}
                   fill="none" stroke="#5c60f5" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
 
@@ -624,6 +629,7 @@ export const Dashboard: React.FC = () => {
                   return (
                     <g key={i} className="line-dot-group">
                       <circle cx={x} cy={cy} r="4" fill="#5c60f5" stroke="#fff" strokeWidth="2" className="line-dot"
+                        style={{ animationDelay: `${0.4 + i * 0.04}s` }}
                         onMouseEnter={() => setActiveTooltip({ type: 'orders', index: i, x, y: cy - 30 })}
                         onMouseLeave={() => setActiveTooltip(null)} />
                       <text x={x} y="142" className="chart-label" textAnchor="middle">{d.label}</text>
