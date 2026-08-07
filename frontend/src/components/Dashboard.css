@@ -567,21 +567,19 @@ body {
   opacity: 0.85;
 }
 
-@keyframes lineRiseUp {
+@keyframes clipRevealFromBottom {
   0% {
     transform: scaleY(0);
-    opacity: 0;
   }
   100% {
     transform: scaleY(1);
-    opacity: 1;
   }
 }
 
-.animated-line-content {
-  transform-origin: 500px 115px;
-  transform-box: fill-box;
-  animation: lineRiseUp 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+.animated-clip-rect {
+  transform-origin: 0px 115px;
+  transform-box: view-box;
+  animation: clipRevealFromBottom 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .chart-label {

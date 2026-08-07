@@ -503,7 +503,7 @@ export const Dashboard: React.FC = () => {
 
             {/* Bar Chart — Tons */}
             <div className="chart-container bar-chart-container">
-              <svg className="bar-chart-svg" viewBox="0 0 1000 200">
+              <svg className="bar-chart-svg" viewBox="0 0 1000 200" key={`bar-svg-${activeDateRange.startDate}-${activeDateRange.endDate}-${revenueData.map(d => d.val1).join('_')}`}>
                 <line x1="30" y1="30" x2="970" y2="30" stroke="#f1f3f9" strokeWidth="1" />
                 <line x1="30" y1="80" x2="970" y2="80" stroke="#f1f3f9" strokeWidth="1" />
                 <line x1="30" y1="130" x2="970" y2="130" stroke="#f1f3f9" strokeWidth="1" />
@@ -594,7 +594,13 @@ export const Dashboard: React.FC = () => {
 
             {/* Line Chart — Forms Created */}
             <div className="chart-container line-chart-container">
-              <svg className="line-chart-svg" viewBox="0 0 1050 150">
+              <svg className="line-chart-svg" viewBox="0 0 1050 150" key={`line-svg-${orderYear}-${monthlyOrderData.map(d=>d.current).join('_')}`}>
+                <defs>
+                  <clipPath id={`forms-clip-${orderYear}-${monthlyOrderData.map(d=>d.current).join('_')}`}>
+                    <rect x="0" y="0" width="1050" height="150" className="animated-clip-rect" />
+                  </clipPath>
+                </defs>
+
                 {/* Y-axis ticks */}
                 {formTicks.map((tick, i) => {
                   const ty = getTickY(i / 4);
@@ -607,8 +613,8 @@ export const Dashboard: React.FC = () => {
                 })}
                 <line x1="55" y1="115" x2="1020" y2="115" stroke="#e4e8f1" strokeWidth="1.5" />
 
-                {/* Group containing line paths + dots animated rising from bottom baseline y=115 */}
-                <g className="animated-line-content" key={`forms-chart-${orderYear}-${monthlyOrderData.length}`}>
+                {/* Group containing line paths + dots with clip-path reveal rising from bottom y=115 */}
+                <g clipPath={`url(#forms-clip-${orderYear}-${monthlyOrderData.map(d=>d.current).join('_')})`}>
                   {/* Previous year line */}
                   <path
                     d={monthlyOrderData.map((d, i) => { const x = 60 + i * (950 / 11); return `${i === 0 ? 'M' : 'L'} ${x} ${getFormY(d.previous)}`; }).join(' ')}
