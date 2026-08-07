@@ -419,7 +419,8 @@ body {
   grid-column: span 3;
 }
 
-.trendUp, .trendDown {
+.trendUp,
+.trendDown {
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -541,7 +542,7 @@ body {
   overflow: visible;
 }
 
-/* ── Dynamic Chart Animations ────────────────────────────────────────────── */
+/* ── Dynamic Chart Animations (Bottom to Top Rise) ───────────────────────── */
 
 @keyframes barGrowUp {
   0% {
@@ -558,7 +559,7 @@ body {
   cursor: pointer;
   transform-origin: bottom;
   transform-box: fill-box;
-  animation: barGrowUp 0.75s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: barGrowUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
   transition: opacity 0.2s ease;
 }
 
@@ -566,45 +567,20 @@ body {
   opacity: 0.85;
 }
 
-@keyframes lineDraw {
-  0% {
-    stroke-dashoffset: 2200;
-    opacity: 0.2;
-  }
-  100% {
-    stroke-dashoffset: 0;
-    opacity: 1;
-  }
-}
-
 .animated-line {
-  stroke-dasharray: 2200;
-  stroke-dashoffset: 2200;
-  animation: lineDraw 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform-origin: bottom;
+  transform-box: fill-box;
+  animation: barGrowUp 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .animated-line.line-current {
-  animation-delay: 0.12s;
-}
-
-@keyframes dotPop {
-  0% {
-    transform: scale(0);
-    opacity: 0;
-  }
-  70% {
-    transform: scale(1.35);
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
+  animation-delay: 0.08s;
 }
 
 .line-dot {
-  transform-origin: center;
+  transform-origin: bottom;
   transform-box: fill-box;
-  animation: dotPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation: barGrowUp 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .chart-label {
@@ -1057,8 +1033,13 @@ body {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 /* Filter and Calendar Popover */
@@ -1106,8 +1087,15 @@ body {
 }
 
 @keyframes popoverFadeIn {
-  from { opacity: 0; transform: translateY(-6px) scale(0.98); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 /* ── Left panel ──────────────────────────────── */
@@ -1355,11 +1343,11 @@ body {
     grid-template-columns: repeat(2, 1fr);
     gap: 24px;
   }
-  
+
   .revenue-card {
     grid-column: span 2;
   }
-  
+
   .order-card {
     grid-column: span 2;
   }
@@ -1373,7 +1361,7 @@ body {
   .top-header {
     gap: 16px;
   }
-  
+
   .search-bar {
     width: 280px;
   }
@@ -1426,7 +1414,7 @@ body {
     padding: 12px 14px 12px 42px;
     font-size: 13px;
   }
-  
+
   .search-icon {
     left: 14px;
   }
@@ -1435,12 +1423,12 @@ body {
   .user-info {
     display: none;
   }
-  
+
   .user-profile {
     padding: 6px;
     gap: 0;
   }
-  
+
   .dropdown-arrow {
     display: none;
   }
@@ -1453,7 +1441,7 @@ body {
   .revenue-card {
     grid-column: span 1;
   }
-  
+
   .order-card {
     grid-column: span 1;
   }
@@ -1463,30 +1451,30 @@ body {
     width: 85px;
     height: 85px;
   }
-  
+
   .bubble-taste {
     width: 100px;
     height: 100px;
     right: 10%;
   }
-  
+
   .bubble-hygiene {
     left: 10%;
   }
-  
+
   .bubble-packaging {
     left: 24%;
     bottom: 12%;
   }
-  
+
   .bubble-pct {
     font-size: 16px;
   }
-  
+
   .bubble-taste .bubble-pct {
     font-size: 18px;
   }
-  
+
   .bubble-label {
     font-size: 9.5px;
   }
@@ -1496,25 +1484,25 @@ body {
   .card-value {
     font-size: 22px;
   }
-  
+
   .card-title {
     font-size: 14px;
   }
-  
+
   .top-header {
     flex-wrap: wrap;
   }
-  
+
   .search-bar {
     order: 3;
     width: 100%;
     margin: 10px 0 0 0;
   }
-  
+
   .header-actions {
     margin-left: auto;
   }
-  
+
   .donut-legend-grid {
     grid-template-columns: 1fr;
     gap: 10px;

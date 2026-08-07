@@ -421,79 +421,79 @@ export const Dashboard: React.FC = () => {
                   <>
                     <div className="filter-popover-backdrop" onClick={() => setIsFilterOpen(false)} />
                     <div className="calendar-popover two-panel">
-                    {/* Left Presets Panel — NO "Last Year" */}
-                    <div className="popover-left-panel">
-                      {(['Last Week', 'Last Month', 'Custom'] as const).map(preset => (
-                        <button
-                          key={preset}
-                          className={`preset-btn ${calendarMode === preset ? 'active' : ''}`}
-                          onClick={() => applyPreset(preset)}
-                        >
-                          {preset}
+                      {/* Left Presets Panel — NO "Last Year" */}
+                      <div className="popover-left-panel">
+                        {(['Last Week', 'Last Month', 'Custom'] as const).map(preset => (
+                          <button
+                            key={preset}
+                            className={`preset-btn ${calendarMode === preset ? 'active' : ''}`}
+                            onClick={() => applyPreset(preset)}
+                          >
+                            {preset}
+                          </button>
+                        ))}
+                        <div className="popover-left-spacer" />
+                        <button className="btn-apply" onClick={handleApplyFilter}>
+                          Apply
                         </button>
-                      ))}
-                      <div className="popover-left-spacer" />
-                      <button className="btn-apply" onClick={handleApplyFilter}>
-                        Apply
-                      </button>
-                      {hasNonDefaultFilter && (
-                        <button
-                          className="btn-reset-ton-filter"
-                          onClick={handleResetFilter}
-                        >
-                          <X size={13} /> Reset Filter
-                        </button>
-                      )}
-                    </div>
+                        {hasNonDefaultFilter && (
+                          <button
+                            className="btn-reset-ton-filter"
+                            onClick={handleResetFilter}
+                          >
+                            <X size={13} /> Reset Filter
+                          </button>
+                        )}
+                      </div>
 
-                    {/* Right Calendar Panel */}
-                    <div className="popover-right-panel">
-                      <div className="calendar-nav-row">
-                        <button
-                          className="nav-arrow-btn"
-                          aria-label="Previous month"
-                          onClick={() => {
-                            if (pendingMonth === 0) { setPendingMonth(11); setPendingYear(pendingYear - 1); }
-                            else setPendingMonth(pendingMonth - 1);
-                          }}
-                        >
-                          <ChevronLeft size={15} />
-                        </button>
-                        <span className="calendar-month-title">
-                          <strong>{monthLongNames[pendingMonth]}</strong>&nbsp;{pendingYear}
-                        </span>
-                        <button
-                          className="nav-arrow-btn"
-                          aria-label="Next month"
-                          onClick={() => {
-                            if (pendingMonth === 11) { setPendingMonth(0); setPendingYear(pendingYear + 1); }
-                            else setPendingMonth(pendingMonth + 1);
-                          }}
-                        >
-                          <ChevronRight size={15} />
-                        </button>
-                      </div>
-                      <div className="calendar-weekdays">
-                        <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
-                      </div>
-                      <div className="calendar-grid-cells">
-                        {getCalendarCells(pendingMonth, pendingYear).map((cell, i) => {
-                          const cellClass = getCellClass(cell.dateObj);
-                          return (
-                            <button
-                              key={i}
-                              className={`calendar-cell ${!cell.isCurrentMonth ? 'padding-day' : ''} ${cellClass}`}
-                              onClick={() => handleCellClick(cell.dateObj)}
-                            >
-                              {cell.day}
-                            </button>
-                          );
-                        })}
+                      {/* Right Calendar Panel */}
+                      <div className="popover-right-panel">
+                        <div className="calendar-nav-row">
+                          <button
+                            className="nav-arrow-btn"
+                            aria-label="Previous month"
+                            onClick={() => {
+                              if (pendingMonth === 0) { setPendingMonth(11); setPendingYear(pendingYear - 1); }
+                              else setPendingMonth(pendingMonth - 1);
+                            }}
+                          >
+                            <ChevronLeft size={15} />
+                          </button>
+                          <span className="calendar-month-title">
+                            <strong>{monthLongNames[pendingMonth]}</strong>&nbsp;{pendingYear}
+                          </span>
+                          <button
+                            className="nav-arrow-btn"
+                            aria-label="Next month"
+                            onClick={() => {
+                              if (pendingMonth === 11) { setPendingMonth(0); setPendingYear(pendingYear + 1); }
+                              else setPendingMonth(pendingMonth + 1);
+                            }}
+                          >
+                            <ChevronRight size={15} />
+                          </button>
+                        </div>
+                        <div className="calendar-weekdays">
+                          <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+                        </div>
+                        <div className="calendar-grid-cells">
+                          {getCalendarCells(pendingMonth, pendingYear).map((cell, i) => {
+                            const cellClass = getCellClass(cell.dateObj);
+                            return (
+                              <button
+                                key={i}
+                                className={`calendar-cell ${!cell.isCurrentMonth ? 'padding-day' : ''} ${cellClass}`}
+                                onClick={() => handleCellClick(cell.dateObj)}
+                              >
+                                {cell.day}
+                              </button>
+                            );
+                          })}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </>
-              )}
+                  </>
+                )}
               </div>
             </div>
 
@@ -503,7 +503,7 @@ export const Dashboard: React.FC = () => {
 
             {/* Bar Chart — Tons */}
             <div className="chart-container bar-chart-container">
-              <svg className="bar-chart-svg" viewBox="0 0 1000 200" key={`bar-${activeDateRange.startDate}-${activeDateRange.endDate}-${revenueData.length}`}>
+              <svg className="bar-chart-svg" viewBox="0 0 1000 200">
                 <line x1="30" y1="30" x2="970" y2="30" stroke="#f1f3f9" strokeWidth="1" />
                 <line x1="30" y1="80" x2="970" y2="80" stroke="#f1f3f9" strokeWidth="1" />
                 <line x1="30" y1="130" x2="970" y2="130" stroke="#f1f3f9" strokeWidth="1" />
@@ -521,16 +521,13 @@ export const Dashboard: React.FC = () => {
                   const h2 = maxBarVal > 0 ? (d.val2 / maxBarVal) * 130 : 0;
                   const y1 = 170 - h1;
                   const y2 = 170 - h2;
-                  const delaySec = (index * 0.03).toFixed(2);
 
                   return (
                     <g key={index} className="bar-group">
                       <rect x={xBase} y={y1} width={barWidth} height={h1} rx="2" fill="#5c60f5"
-                        style={{ animationDelay: `${delaySec}s` }}
                         onMouseEnter={() => setActiveTooltip({ type: 'revenue', index, x: xBase + barWidth / 2, y: y1 - 35 })}
                         onMouseLeave={() => setActiveTooltip(null)} />
                       <rect x={xBase + barWidth + barSpacing} y={y2} width={barWidth} height={h2} rx="2" fill="#e4e6fc"
-                        style={{ animationDelay: `${delaySec}s` }}
                         onMouseEnter={() => setActiveTooltip({ type: 'revenue', index, x: xBase + barWidth + barSpacing + barWidth / 2, y: y2 - 35 })}
                         onMouseLeave={() => setActiveTooltip(null)} />
                       {(totalCount <= 14 || index % 2 === 0) && (
@@ -597,7 +594,7 @@ export const Dashboard: React.FC = () => {
 
             {/* Line Chart — Forms Created */}
             <div className="chart-container line-chart-container">
-              <svg className="line-chart-svg" viewBox="0 0 1050 150" key={`line-${orderYear}-${monthlyOrderData.length}`}>
+              <svg className="line-chart-svg" viewBox="0 0 1050 150">
                 {/* Y-axis ticks */}
                 {formTicks.map((tick, i) => {
                   const ty = getTickY(i / 4);
@@ -612,13 +609,11 @@ export const Dashboard: React.FC = () => {
 
                 {/* Previous year line */}
                 <path
-                  className="animated-line line-previous"
                   d={monthlyOrderData.map((d, i) => { const x = 60 + i * (950 / 11); return `${i === 0 ? 'M' : 'L'} ${x} ${getFormY(d.previous)}`; }).join(' ')}
                   fill="none" stroke="#cdd1fd" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
 
                 {/* Current year line */}
                 <path
-                  className="animated-line line-current"
                   d={monthlyOrderData.map((d, i) => { const x = 60 + i * (950 / 11); return `${i === 0 ? 'M' : 'L'} ${x} ${getFormY(d.current)}`; }).join(' ')}
                   fill="none" stroke="#5c60f5" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
 
@@ -629,7 +624,6 @@ export const Dashboard: React.FC = () => {
                   return (
                     <g key={i} className="line-dot-group">
                       <circle cx={x} cy={cy} r="4" fill="#5c60f5" stroke="#fff" strokeWidth="2" className="line-dot"
-                        style={{ animationDelay: `${0.4 + i * 0.04}s` }}
                         onMouseEnter={() => setActiveTooltip({ type: 'orders', index: i, x, y: cy - 30 })}
                         onMouseLeave={() => setActiveTooltip(null)} />
                       <text x={x} y="142" className="chart-label" textAnchor="middle">{d.label}</text>
