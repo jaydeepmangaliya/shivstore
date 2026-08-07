@@ -607,29 +607,32 @@ export const Dashboard: React.FC = () => {
                 })}
                 <line x1="55" y1="115" x2="1020" y2="115" stroke="#e4e8f1" strokeWidth="1.5" />
 
-                {/* Previous year line */}
-                <path
-                  d={monthlyOrderData.map((d, i) => { const x = 60 + i * (950 / 11); return `${i === 0 ? 'M' : 'L'} ${x} ${getFormY(d.previous)}`; }).join(' ')}
-                  fill="none" stroke="#cdd1fd" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                {/* Group containing line paths + dots animated rising from bottom baseline y=115 */}
+                <g className="animated-line-content" key={`forms-chart-${orderYear}-${monthlyOrderData.length}`}>
+                  {/* Previous year line */}
+                  <path
+                    d={monthlyOrderData.map((d, i) => { const x = 60 + i * (950 / 11); return `${i === 0 ? 'M' : 'L'} ${x} ${getFormY(d.previous)}`; }).join(' ')}
+                    fill="none" stroke="#cdd1fd" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
 
-                {/* Current year line */}
-                <path
-                  d={monthlyOrderData.map((d, i) => { const x = 60 + i * (950 / 11); return `${i === 0 ? 'M' : 'L'} ${x} ${getFormY(d.current)}`; }).join(' ')}
-                  fill="none" stroke="#5c60f5" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                  {/* Current year line */}
+                  <path
+                    d={monthlyOrderData.map((d, i) => { const x = 60 + i * (950 / 11); return `${i === 0 ? 'M' : 'L'} ${x} ${getFormY(d.current)}`; }).join(' ')}
+                    fill="none" stroke="#5c60f5" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
 
-                {/* Dots + labels */}
-                {monthlyOrderData.map((d, i) => {
-                  const x = 60 + i * (950 / 11);
-                  const cy = getFormY(d.current);
-                  return (
-                    <g key={i} className="line-dot-group">
-                      <circle cx={x} cy={cy} r="4" fill="#5c60f5" stroke="#fff" strokeWidth="2" className="line-dot"
-                        onMouseEnter={() => setActiveTooltip({ type: 'orders', index: i, x, y: cy - 30 })}
-                        onMouseLeave={() => setActiveTooltip(null)} />
-                      <text x={x} y="142" className="chart-label" textAnchor="middle">{d.label}</text>
-                    </g>
-                  );
-                })}
+                  {/* Dots + labels */}
+                  {monthlyOrderData.map((d, i) => {
+                    const x = 60 + i * (950 / 11);
+                    const cy = getFormY(d.current);
+                    return (
+                      <g key={i} className="line-dot-group">
+                        <circle cx={x} cy={cy} r="4" fill="#5c60f5" stroke="#fff" strokeWidth="2" className="line-dot"
+                          onMouseEnter={() => setActiveTooltip({ type: 'orders', index: i, x, y: cy - 30 })}
+                          onMouseLeave={() => setActiveTooltip(null)} />
+                        <text x={x} y="142" className="chart-label" textAnchor="middle">{d.label}</text>
+                      </g>
+                    );
+                  })}
+                </g>
               </svg>
 
               {activeTooltip && activeTooltip.type === 'orders' && (

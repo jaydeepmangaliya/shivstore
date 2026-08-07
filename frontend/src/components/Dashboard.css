@@ -567,20 +567,21 @@ body {
   opacity: 0.85;
 }
 
-.animated-line {
-  transform-origin: bottom;
-  transform-box: fill-box;
-  animation: barGrowUp 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+@keyframes lineRiseUp {
+  0% {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
 }
 
-.animated-line.line-current {
-  animation-delay: 0.08s;
-}
-
-.line-dot {
-  transform-origin: bottom;
+.animated-line-content {
+  transform-origin: 500px 115px;
   transform-box: fill-box;
-  animation: barGrowUp 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: lineRiseUp 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .chart-label {
