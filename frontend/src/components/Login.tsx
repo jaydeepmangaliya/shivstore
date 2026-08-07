@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { login } from '../services/api';
 import { useToast } from './Toast';
+import { ParticleCanvas } from './ParticleCanvas';
 import './Login.css';
 
 export const Login: React.FC = () => {
@@ -74,6 +75,9 @@ export const Login: React.FC = () => {
 
   return (
     <div className="auth-page" onMouseMove={handleMouseMove}>
+      {/* Interactive Background Particle Constellation Canvas */}
+      <ParticleCanvas />
+
       {/* Dynamic Cursor Spotlight Follower */}
       <div
         className="auth-mouse-spotlight"
