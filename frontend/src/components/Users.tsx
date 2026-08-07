@@ -34,10 +34,19 @@ export const Users: React.FC = () => {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [records, setRecords] = useState<GatePassRecord[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
+
+  // Debounce search query updates by 350ms to prevent calling API on every keystroke
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   const [selectedRecord, setSelectedRecord] = useState<GatePassRecord | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -54,7 +63,7 @@ export const Users: React.FC = () => {
   };
 
   // Load saved gate passes from live DB API
-  const loadRecords = (q: string = searchQuery) => {
+  const loadRecords = (q: string = debouncedSearch) => {
     setIsLoading(true);
     fetchGatePasses(q)
       .then(dtos => {
@@ -87,8 +96,8 @@ export const Users: React.FC = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-    loadRecords(searchQuery);
-  }, [searchQuery]);
+    loadRecords(debouncedSearch);
+  }, [debouncedSearch]);
 
   const handleDeleteRecord = async (id?: string | number) => {
     if (!id) return;
@@ -226,7 +235,15 @@ export const Users: React.FC = () => {
               onChange={e => setSearchQuery(e.target.value)}
             />
             {searchQuery && (
-              <button className="clear-search-btn" onClick={() => setSearchQuery('')}>&times;</button>
+              <button
+                type="button"
+                className="clear-search-btn"
+                onClick={() => setSearchQuery('')}
+                title="Clear search"
+                aria-label="Clear search"
+              >
+                <X size={14} />
+              </button>
             )}
           </div>
 

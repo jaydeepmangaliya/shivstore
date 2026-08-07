@@ -82,12 +82,24 @@
   right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  background: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  color: #64748b;
   border: none;
-  font-size: 18px;
-  color: #8b92a6;
   cursor: pointer;
   padding: 0;
+  transition: all 0.15s ease;
+  outline: none;
+}
+
+.clear-search-btn:hover {
+  background: #fee2e2;
+  color: #dc2626;
 }
 
 .date-filter-wrapper {

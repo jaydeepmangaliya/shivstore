@@ -30,12 +30,21 @@ export const VehicleOverview: React.FC = () => {
   const [vehicles, setVehicles] = useState<VehicleSummaryDTO[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Filters
+  // Filters & Debouncing
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [selectedMaterial, setSelectedMaterial] = useState('ALL');
   const [sortBy, setSortBy] = useState<'tons' | 'trips' | 'vehicle'>('tons');
+
+  // Debounce search query to prevent calling API on every keystroke
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   // Detail Modal state
   const [selectedVehicle, setSelectedVehicle] = useState<VehicleSummaryDTO | null>(null);
@@ -54,7 +63,7 @@ export const VehicleOverview: React.FC = () => {
 
   const loadData = () => {
     setIsLoading(true);
-    fetchVehicleSummaries(startDate, endDate, searchQuery)
+    fetchVehicleSummaries(startDate, endDate, debouncedSearch)
       .then(data => {
         setVehicles(data);
       })
@@ -68,7 +77,7 @@ export const VehicleOverview: React.FC = () => {
 
   useEffect(() => {
     loadData();
-  }, [startDate, endDate, searchQuery]);
+  }, [startDate, endDate, debouncedSearch]);
 
   // Extract all unique material names across all vehicles
   const allMaterialNames = Array.from(
@@ -235,7 +244,15 @@ export const VehicleOverview: React.FC = () => {
               onChange={e => setSearchQuery(e.target.value)}
             />
             {searchQuery && (
-              <button className="vo-clear-btn" onClick={() => setSearchQuery('')}>&times;</button>
+              <button
+                type="button"
+                className="vo-clear-btn"
+                onClick={() => setSearchQuery('')}
+                title="Clear search"
+                aria-label="Clear search"
+              >
+                <X size={14} />
+              </button>
             )}
           </div>
 
