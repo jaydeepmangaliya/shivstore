@@ -152,15 +152,9 @@ export const Register: React.FC = () => {
         }}
       />
 
-      {/* Brand Panel — Left Side with 3D Parallax */}
+      {/* Brand Panel — Left Side */}
       <div className="auth-brand-panel">
-        <div
-          className="auth-brand-content"
-          style={{
-            transform: `perspective(1000px) rotateY(${mousePos.x * 8}deg) rotateX(${-mousePos.y * 8}deg)`,
-            transition: 'transform 0.1s ease-out',
-          }}
-        >
+        <div className="auth-brand-content">
           <div className="auth-brand-logo">
             <span className="auth-brand-logo-letter">S</span>
           </div>
