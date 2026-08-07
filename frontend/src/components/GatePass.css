@@ -810,45 +810,60 @@
     gap: 12px;
   }
 
+  /* Sleek side-by-side 50/50 mobile button layout */
   .gp-actions {
-    flex-direction: column;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 10px !important;
+    width: 100% !important;
+    margin-top: 16px !important;
   }
 
   .gp-btn-save,
   .gp-btn-export {
-    width: 100%;
+    flex: 1 !important;
+    width: 50% !important;
+    height: 44px !important;
+    padding: 0 10px !important;
+    font-size: 12.5px !important;
+    border-radius: 10px !important;
+    white-space: nowrap !important;
+    justify-content: center !important;
+  }
+
+  .gp-btn-save span,
+  .gp-btn-export span {
+    font-size: 12.5px !important;
   }
 
   .gp-form-panel {
-    padding: 20px 16px;
+    padding: 18px 14px !important;
   }
 
   .users-modal-body {
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch;
-    padding: 12px !important;
+    padding: 10px !important;
   }
 
-  .users-modal-body .gp-page.gp-modal-layout {
-    flex-direction: column-reverse;
-    overflow-y: visible;
-    height: auto;
-    gap: 16px;
+  .gp-page.gp-modal-layout {
+    flex-direction: column !important;
+    overflow-y: visible !important;
+    height: auto !important;
+    gap: 0 !important;
   }
 
-  .users-modal-body .gp-page.gp-modal-layout .gp-form-panel {
-    width: 100%;
-    height: auto;
-    overflow-y: visible;
-    padding: 20px 16px;
-    border-radius: 14px;
+  .gp-page.gp-modal-layout .gp-form-panel {
+    width: 100% !important;
+    height: auto !important;
+    overflow-y: visible !important;
+    padding: 18px 14px !important;
+    border-radius: 14px !important;
+    box-shadow: none !important;
   }
 
-  .users-modal-body .gp-page.gp-modal-layout .gp-preview-panel {
-    width: 100%;
-    min-width: 0;
-    height: auto;
-    overflow-y: visible;
-    display: none; /* Hide redundant inline receipt on mobile modal to keep edit form ultra clean */
+  /* Hide redundant inline receipt inside edit modal on mobile */
+  .gp-page.gp-modal-layout .gp-preview-panel {
+    display: none !important;
   }
 }
