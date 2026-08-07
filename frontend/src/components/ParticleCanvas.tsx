@@ -42,18 +42,19 @@ export const ParticleCanvas: React.FC = () => {
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseleave', handleMouseLeave);
 
-    const particleCount = Math.min(75, Math.floor((width * height) / 16000));
+    // High density dots count (~200 particles)
+    const particleCount = Math.min(220, Math.floor((width * height) / 6500));
     const particles: Particle[] = [];
-    const colors = ['#6366f1', '#8b5cf6', '#a78bfa', '#c084fc', '#e0e7ff'];
+    const colors = ['#818cf8', '#a78bfa', '#c084fc', '#38bdf8', '#ffffff', '#e0e7ff'];
 
     for (let i = 0; i < particleCount; i++) {
       particles.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.5,
-        radius: Math.random() * 1.8 + 1,
-        alpha: Math.random() * 0.5 + 0.2,
+        vx: (Math.random() - 0.5) * 0.7,
+        vy: (Math.random() - 0.5) * 0.7,
+        radius: Math.random() * 2.2 + 1.6,
+        alpha: Math.random() * 0.35 + 0.65, // Highly visible (0.65 - 1.0)
         color: colors[Math.floor(Math.random() * colors.length)],
       });
     }
@@ -67,54 +68,62 @@ export const ParticleCanvas: React.FC = () => {
         p.x += p.vx;
         p.y += p.vy;
 
-        if (p.x < 0) p.x = width;
-        if (p.x > width) p.x = 0;
-        if (p.y < 0) p.y = height;
-        if (p.y > height) p.y = 0;
+        // Screen boundary wrap
+        if (p.x < -10) p.x = width + 10;
+        if (p.x > width + 10) p.x = -10;
+        if (p.y < -10) p.y = height + 10;
+        if (p.y > height + 10) p.y = -10;
 
-        // Mouse attraction & subtle connection thread
+        // Spider leg attraction to mouse
         if (mouse.active) {
           const dx = mouse.x - p.x;
           const dy = mouse.y - p.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
 
-          if (dist < 150) {
-            const force = (150 - dist) / 150;
-            p.x += (dx / dist) * force * 0.7;
-            p.y += (dy / dist) * force * 0.7;
+          if (dist < 170) {
+            const force = (170 - dist) / 170;
+            p.x += (dx / dist) * force * 0.8;
+            p.y += (dy / dist) * force * 0.8;
 
-            // Soft connection line to cursor
+            // Bright spider-leg connection line to cursor
+            ctx.save();
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(mouse.x, mouse.y);
-            ctx.strokeStyle = `rgba(167, 139, 250, ${force * 0.25})`;
-            ctx.lineWidth = 0.7;
+            ctx.strokeStyle = `rgba(167, 139, 250, ${force * 0.55})`;
+            ctx.lineWidth = 1.1;
+            ctx.shadowBlur = 6;
+            ctx.shadowColor = '#a78bfa';
             ctx.stroke();
+            ctx.restore();
           }
         }
 
-        // Draw particle dot
+        // Draw bright glowing particle dot
+        ctx.save();
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = p.color;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
         ctx.fillStyle = p.color;
         ctx.globalAlpha = p.alpha;
         ctx.fill();
-        ctx.globalAlpha = 1.0;
+        ctx.restore();
 
-        // Connect nearby particles
+        // Connect spider web constellation lines between nearby dots
         for (let j = i + 1; j < particles.length; j++) {
           const p2 = particles[j];
           const dx = p.x - p2.x;
           const dy = p.y - p2.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
 
-          if (dist < 110) {
-            const alpha = (1 - dist / 110) * 0.15;
+          if (dist < 125) {
+            const lineAlpha = (1 - dist / 125) * 0.38;
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = `rgba(99, 102, 241, ${alpha})`;
-            ctx.lineWidth = 0.6;
+            ctx.strokeStyle = `rgba(129, 140, 248, ${lineAlpha})`;
+            ctx.lineWidth = 0.8;
             ctx.stroke();
           }
         }
