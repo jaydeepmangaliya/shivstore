@@ -27,8 +27,10 @@ public class GatePass {
     /** Display date in DD/MM/YYYY format as shown on the form. */
     private String date;
 
+    @Indexed
     private String partyName;
 
+    @Indexed
     private String vehicleNumber;
 
     private String materials;
@@ -57,5 +59,6 @@ public class GatePass {
     private String gatePassSignature;
 
     /** Server-side creation timestamp (UTC). Used for ordering and dashboard stats. */
+    @Indexed
     private LocalDateTime createdAt;
 }
