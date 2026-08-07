@@ -8,7 +8,6 @@ import {
   Search,
   LogOut,
   Calendar,
-  Layers,
   ArrowUpDown,
   Eye,
   X,
@@ -35,7 +34,6 @@ export const VehicleOverview: React.FC = () => {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [selectedMaterial, setSelectedMaterial] = useState('ALL');
   const [sortBy, setSortBy] = useState<'tons' | 'trips' | 'vehicle'>('tons');
 
   // Debounce search query to prevent calling API on every keystroke
@@ -79,22 +77,8 @@ export const VehicleOverview: React.FC = () => {
     loadData();
   }, [startDate, endDate, debouncedSearch]);
 
-  // Extract all unique material names across all vehicles
-  const allMaterialNames = Array.from(
-    new Set(
-      vehicles.flatMap(v => Object.keys(v.materialBreakdownTons || {}))
-    )
-  ).sort();
-
-  // Filter vehicles by material if selected
-  const filteredVehicles = vehicles.filter(v => {
-    if (selectedMaterial === 'ALL') return true;
-    const matTons = v.materialBreakdownTons ? v.materialBreakdownTons[selectedMaterial] : 0;
-    return matTons && matTons > 0;
-  });
-
   // Sort vehicles
-  const sortedVehicles = [...filteredVehicles].sort((a, b) => {
+  const sortedVehicles = [...vehicles].sort((a, b) => {
     if (sortBy === 'trips') return b.totalTrips - a.totalTrips;
     if (sortBy === 'vehicle') return a.vehicleNumber.localeCompare(b.vehicleNumber);
     return b.totalTons - a.totalTons; // default tons
@@ -284,28 +268,6 @@ export const VehicleOverview: React.FC = () => {
           </div>
         </div>
 
-        {/* Material Filter Chips */}
-        {allMaterialNames.length > 0 && (
-          <div className="vo-material-chips-bar">
-            <span className="vo-chip-label"><Layers size={14} /> Material Filter:</span>
-            <button
-              className={`vo-material-chip ${selectedMaterial === 'ALL' ? 'active' : ''}`}
-              onClick={() => setSelectedMaterial('ALL')}
-            >
-              All Materials
-            </button>
-            {allMaterialNames.map(m => (
-              <button
-                key={m}
-                className={`vo-material-chip ${selectedMaterial === m ? 'active' : ''}`}
-                onClick={() => setSelectedMaterial(m)}
-              >
-                {m}
-              </button>
-            ))}
-          </div>
-        )}
-
         {/* Vehicles Table / Leaderboard */}
         <div className="table-card vo-table-card">
           {isLoading ? (
@@ -329,7 +291,6 @@ export const VehicleOverview: React.FC = () => {
                     <th style={{ textAlign: 'center' }}>Total Trips</th>
                     <th style={{ textAlign: 'right' }}>Cumulative Weight (kg)</th>
                     <th style={{ textAlign: 'right' }}>Total Net Tons</th>
-                    <th>Material Breakdown</th>
                     <th>Last Active Date</th>
                     <th style={{ textAlign: 'center' }}>Action</th>
                   </tr>
@@ -354,15 +315,6 @@ export const VehicleOverview: React.FC = () => {
                         </td>
                         <td style={{ textAlign: 'right', fontWeight: 800, color: '#059669', fontSize: '14px' }}>
                           {v.totalTons.toFixed(2)} Tons
-                        </td>
-                        <td>
-                          <div className="vo-materials-list">
-                            {Object.entries(v.materialBreakdownTons || {}).map(([mat, tons]) => (
-                              <span key={mat} className="vo-mat-tag">
-                                <strong>{mat}</strong>: {tons.toFixed(1)}T
-                              </span>
-                            ))}
-                          </div>
                         </td>
                         <td className="cell-date">
                           <div className="cell-date-content">

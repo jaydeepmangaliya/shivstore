@@ -67,7 +67,7 @@ async function apiFetch(url: string, options: RequestInit = {}): Promise<Respons
     });
   } catch {
     throw new Error(
-      'Cannot reach the server. Please make sure the backend is running on port 3001.'
+      'Unable to connect to the server. Please check your network connection or try again later.'
     );
   }
 
@@ -104,7 +104,7 @@ export async function register(
     });
   } catch {
     throw new Error(
-      'Cannot reach the server. Please make sure the backend is running on port 3001.'
+      'Unable to connect to the server. Please check your network connection or try again later.'
     );
   }
 
@@ -129,7 +129,7 @@ export async function login(email: string, password: string): Promise<LoginRespo
     });
   } catch {
     throw new Error(
-      'Cannot reach the server. Please make sure the backend is running on port 3001.'
+      'Unable to connect to the server. Please check your network connection or try again later.'
     );
   }
 
@@ -153,7 +153,7 @@ export async function forgotPassword(email: string): Promise<string> {
       body: JSON.stringify({ email }),
     });
   } catch {
-    throw new Error('Cannot reach the server. Please make sure the backend is running on port 3001.');
+    throw new Error('Unable to connect to the server. Please check your network connection or try again later.');
   }
 
   const data = await res.json().catch(() => ({}));
@@ -173,7 +173,7 @@ export async function resetPassword(token: string, newPassword: string): Promise
       body: JSON.stringify({ token, newPassword }),
     });
   } catch {
-    throw new Error('Cannot reach the server. Please make sure the backend is running on port 3001.');
+    throw new Error('Unable to connect to the server. Please check your network connection or try again later.');
   }
 
   const data = await res.json().catch(() => ({}));

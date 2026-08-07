@@ -264,16 +264,6 @@ export const Users: React.FC = () => {
               buttonLabel="Filter by Date"
             />
           </div>
-
-          {searchQuery && (
-            <button
-              className="btn-reset-filter"
-              onClick={() => { setSearchQuery(''); setCurrentPage(1); }}
-              title="Clear search"
-            >
-              ✕ Clear Search
-            </button>
-          )}
         </div>
 
         {/* ── Users / Gate Pass Table ────────────────────────────────────── */}
