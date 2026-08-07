@@ -211,7 +211,11 @@ export const SingleRangeDatePicker: React.FC<SingleRangeDatePickerProps> = ({
       )}
 
       {showPopover && (
-        <div className={`srdp-popover ${inline ? 'srdp-inline-popover' : ''}`}>
+        <>
+          {!inline && isOpen && (
+            <div className="srdp-backdrop" onClick={() => setIsOpen(false)} />
+          )}
+          <div className={`srdp-popover ${inline ? 'srdp-inline-popover' : ''}`}>
           {/* Left Presets & Actions Panel */}
           <div className="srdp-left-panel">
             <span className="srdp-panel-title">PRESETS</span>
@@ -301,6 +305,7 @@ export const SingleRangeDatePicker: React.FC<SingleRangeDatePickerProps> = ({
             </div>
           </div>
         </div>
+        </>
       )}
     </div>
   );
