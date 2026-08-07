@@ -42,8 +42,15 @@ export const ParticleCanvas: React.FC = () => {
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseleave', handleMouseLeave);
 
-    // High density dots count (~200 particles)
-    const particleCount = Math.min(220, Math.floor((width * height) / 6500));
+    // Responsive configuration based on screen width
+    const isMobile = width < 768;
+    const particleCount = isMobile ? 35 : Math.min(220, Math.floor((width * height) / 6500));
+    const minRadius = isMobile ? 0.8 : 1.6;
+    const radiusRange = isMobile ? 0.8 : 2.2;
+    const shadowBlurVal = isMobile ? 2 : 8;
+    const linkDist = isMobile ? 75 : 125;
+    const mouseAttractDist = isMobile ? 100 : 170;
+
     const particles: Particle[] = [];
     const colors = ['#818cf8', '#a78bfa', '#c084fc', '#38bdf8', '#ffffff', '#e0e7ff'];
 
@@ -51,10 +58,10 @@ export const ParticleCanvas: React.FC = () => {
       particles.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.7,
-        vy: (Math.random() - 0.5) * 0.7,
-        radius: Math.random() * 2.2 + 1.6,
-        alpha: Math.random() * 0.35 + 0.65, // Highly visible (0.65 - 1.0)
+        vx: (Math.random() - 0.5) * (isMobile ? 0.4 : 0.7),
+        vy: (Math.random() - 0.5) * (isMobile ? 0.4 : 0.7),
+        radius: Math.random() * radiusRange + minRadius,
+        alpha: isMobile ? Math.random() * 0.3 + 0.4 : Math.random() * 0.35 + 0.65,
         color: colors[Math.floor(Math.random() * colors.length)],
       });
     }
@@ -74,35 +81,35 @@ export const ParticleCanvas: React.FC = () => {
         if (p.y < -10) p.y = height + 10;
         if (p.y > height + 10) p.y = -10;
 
-        // Spider leg attraction to mouse
+        // Mouse attraction
         if (mouse.active) {
           const dx = mouse.x - p.x;
           const dy = mouse.y - p.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
 
-          if (dist < 170) {
-            const force = (170 - dist) / 170;
-            p.x += (dx / dist) * force * 0.8;
-            p.y += (dy / dist) * force * 0.8;
+          if (dist < mouseAttractDist) {
+            const force = (mouseAttractDist - dist) / mouseAttractDist;
+            p.x += (dx / dist) * force * 0.7;
+            p.y += (dy / dist) * force * 0.7;
 
-            // Bright spider-leg connection line to cursor
+            // Connection line to cursor
             ctx.save();
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(mouse.x, mouse.y);
-            ctx.strokeStyle = `rgba(167, 139, 250, ${force * 0.55})`;
-            ctx.lineWidth = 1.1;
-            ctx.shadowBlur = 6;
-            ctx.shadowColor = '#a78bfa';
+            ctx.strokeStyle = `rgba(167, 139, 250, ${force * 0.45})`;
+            ctx.lineWidth = isMobile ? 0.6 : 1.1;
             ctx.stroke();
             ctx.restore();
           }
         }
 
-        // Draw bright glowing particle dot
+        // Draw particle dot
         ctx.save();
-        ctx.shadowBlur = 8;
-        ctx.shadowColor = p.color;
+        if (shadowBlurVal > 0) {
+          ctx.shadowBlur = shadowBlurVal;
+          ctx.shadowColor = p.color;
+        }
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
         ctx.fillStyle = p.color;
@@ -110,20 +117,20 @@ export const ParticleCanvas: React.FC = () => {
         ctx.fill();
         ctx.restore();
 
-        // Connect spider web constellation lines between nearby dots
+        // Connect constellation web lines between nearby dots
         for (let j = i + 1; j < particles.length; j++) {
           const p2 = particles[j];
           const dx = p.x - p2.x;
           const dy = p.y - p2.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
 
-          if (dist < 125) {
-            const lineAlpha = (1 - dist / 125) * 0.38;
+          if (dist < linkDist) {
+            const lineAlpha = (1 - dist / linkDist) * (isMobile ? 0.2 : 0.38);
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(p2.x, p2.y);
             ctx.strokeStyle = `rgba(129, 140, 248, ${lineAlpha})`;
-            ctx.lineWidth = 0.8;
+            ctx.lineWidth = isMobile ? 0.5 : 0.8;
             ctx.stroke();
           }
         }

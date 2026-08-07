@@ -729,6 +729,11 @@
 
 /* ── Responsive ─────────────────────────────────────────────────────────── */
 @media (max-width: 900px) {
+  .auth-mouse-spotlight,
+  .auth-mouse-dot {
+    display: none !important;
+  }
+
   .auth-page {
     flex-direction: column;
   }
