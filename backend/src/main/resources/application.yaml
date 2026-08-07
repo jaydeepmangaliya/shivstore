@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: ShiveStore
+
+  data:
+    mongodb:
+      # MongoDB Atlas — override with MONGODB_URI env var in production
+      uri: ${MONGODB_URI:mongodb+srv://brandstore111111_db_user:1pLQbJVtQXEY070x@cluster0.b146y9k.mongodb.net/shiv_store_db?retryWrites=true&w=majority}
+
+  # Gmail SMTP Configuration for Password Reset Emails
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${GMAIL_USERNAME:}
+    password: ${GMAIL_APP_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+server:
+  port: 3001
+
+logging:
+  level:
+    com.ShivStore: INFO
+    org.springframework.data.mongodb: INFO
+
+# JWT Configuration
+# ⚠️ Set JWT_SECRET as an environment variable in production.
+# Must be at least 256 bits (32+ characters). Local fallback default used when not set.
+jwt:
+  secret: ${JWT_SECRET:ShivStoreSecretKeyForJWTAuthenticationMustBeAtLeast256BitsLong2026}
+  expiration-ms: 21600000   # 6 hours in milliseconds

@@ -1,0 +1,141 @@
+/* Forms listing grid */
+.forms-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.form-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 22px 20px;
+  background: #ffffff;
+  border: 1.5px solid #f1f3f9;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(9,13,34,0.04);
+}
+
+.form-card:hover:not(.form-card-placeholder) {
+  border-color: #5c60f5;
+  box-shadow: 0 8px 24px rgba(92,96,245,0.10);
+  transform: translateY(-2px);
+}
+
+.form-card-placeholder {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: #fafbff;
+}
+
+.form-card-icon {
+  font-size: 32px;
+  line-height: 1;
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  background: #f4f5fb;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.form-card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.form-card-tag {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: #5c60f5;
+  margin-bottom: 4px;
+}
+
+.form-card-placeholder .form-card-tag {
+  color: #aab2cc;
+}
+
+.form-card-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1e35;
+  margin: 0 0 4px;
+}
+
+.form-card-desc {
+  font-size: 12.5px;
+  color: #8b92a6;
+  line-height: 1.5;
+}
+
+.form-card-arrow {
+  color: #5c60f5;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  background: #ececfd;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.form-card:hover:not(.form-card-placeholder) .form-card-arrow {
+  background: #5c60f5;
+  color: #ffffff;
+}
+
+.form-card-arrow.muted {
+  color: #aab2cc;
+  background: #f4f5fb;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.breadcrumb-link {
+  background: none;
+  border: none;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #5c60f5;
+  cursor: pointer;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+
+.breadcrumb-link:hover {
+  opacity: 0.75;
+}
+
+.breadcrumb-sep {
+  color: #aab2cc;
+  font-size: 13px;
+}
+
+.breadcrumb-current {
+  font-size: 12.5px;
+  color: #8b92a6;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .forms-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,834 @@
+/* ── Page Layout ──────────────────────────────────────── */
+.gp-page {
+  display: flex;
+  gap: 28px;
+  align-items: stretch;
+  min-height: calc(100vh - 120px);
+  padding: 0;
+}
+
+/* ══════════════════════════════════════════════════════════
+   MODAL-ONLY overrides — scoped to .users-modal-body
+   These NEVER affect the /forms (Gate Pass Entry) page.
+   ══════════════════════════════════════════════════════════ */
+
+.users-modal-body .gp-page.gp-modal-layout {
+  display: flex;
+  gap: 20px;
+  align-items: stretch;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ── Form panel inside modal ── */
+.users-modal-body .gp-page.gp-modal-layout .gp-form-panel {
+  flex: 1.35;
+  height: 100%;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 28px 32px;
+  box-shadow: 0 4px 24px rgba(9, 13, 34, 0.04);
+  border: 1px solid #eaecf4;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.users-modal-body .gp-page.gp-modal-layout .gp-form-panel::-webkit-scrollbar {
+  width: 6px;
+}
+.users-modal-body .gp-page.gp-modal-layout .gp-form-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+.users-modal-body .gp-page.gp-modal-layout .gp-form-panel::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+/* ── Preview panel inside modal — scrollable ── */
+.users-modal-body .gp-page.gp-modal-layout .gp-preview-panel {
+  flex: 1;
+  min-width: 400px;
+  height: 100%;
+  position: static;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.users-modal-body .gp-page.gp-modal-layout .gp-preview-panel::-webkit-scrollbar {
+  width: 6px;
+}
+.users-modal-body .gp-page.gp-modal-layout .gp-preview-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+.users-modal-body .gp-page.gp-modal-layout .gp-preview-panel::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.users-modal-body .gp-page.gp-modal-layout .gp-preview-bg {
+  flex: 1;
+  background: #f1f3f9;
+  border-radius: 18px;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  border: 1px solid #eaecf4;
+  min-height: max-content;
+}
+
+/* ── Base Left/Right Panels (Forms page — untouched) ─────────────────────── */
+.gp-form-panel {
+  flex: 1.1;
+  min-width: 0;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 28px 30px;
+  box-shadow: 0 4px 24px rgba(9, 13, 34, 0.05);
+  border: 1px solid #f1f3f9;
+}
+
+/* ── Modal-only receipt text overrides ─────────────────────────────────── */
+.users-modal-body .gp-page.gp-modal-layout .rcp-company-name {
+  font-size: 22px;
+  font-weight: 800;
+  margin-top: 2px;
+}
+
+.users-modal-body .gp-page.gp-modal-layout .rcp-address {
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.users-modal-body .gp-page.gp-modal-layout .rcp-hr {
+  margin: 10px 0;
+}
+
+.users-modal-body .gp-page.gp-modal-layout .rcp-no-date {
+  margin-bottom: 10px;
+}
+
+.users-modal-body .gp-page.gp-modal-layout .rcp-nd-label {
+  font-size: 13.5px;
+}
+
+.users-modal-body .gp-page.gp-modal-layout .rcp-no-val {
+  font-size: 18px;
+}
+
+.users-modal-body .gp-page.gp-modal-layout .rcp-nd-value {
+  font-size: 13.5px;
+}
+
+.users-modal-body .gp-page.gp-modal-layout .rcp-field {
+  margin-bottom: 10px;
+}
+
+.users-modal-body .gp-page.gp-modal-layout .rcp-field-label {
+  font-size: 12px;
+  margin-bottom: 2px;
+}
+
+.users-modal-body .gp-page.gp-modal-layout .rcp-field-line {
+  min-height: 26px;
+  padding-bottom: 3px;
+}
+
+.users-modal-body .gp-page.gp-modal-layout .rcp-field-value {
+  font-size: 14px;
+  padding-bottom: 1px;
+}
+
+.users-modal-body .gp-page.gp-modal-layout .rcp-unit {
+  font-size: 12px;
+}
+
+.users-modal-body .gp-page.gp-modal-layout .rcp-sigs {
+  margin-top: 14px;
+  gap: 18px;
+}
+
+.users-modal-body .gp-page.gp-modal-layout .rcp-sig-content {
+  height: 24px;
+}
+
+.users-modal-body .gp-page.gp-modal-layout .cursive-sig {
+  font-size: 13px;
+}
+
+
+.gp-form-header {
+  margin-bottom: 24px;
+}
+
+.gp-form-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1e35;
+  margin: 0 0 4px;
+}
+
+.gp-form-sub {
+  font-size: 13px;
+  color: #8b92a6;
+}
+
+/* ── Form Fields & Grid ───────────────────────────────── */
+.gp-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.gp-row {
+  display: flex;
+  gap: 14px;
+}
+
+.gp-row .gp-field {
+  flex: 1;
+}
+
+.gp-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.gp-field label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #5c6275;
+}
+
+.gp-field .req {
+  color: #d84315;
+  font-weight: 700;
+}
+
+.gp-field input,
+.gp-field select,
+.gp-select-input {
+  width: 100%;
+  height: 42px;
+  padding: 0 14px;
+  border: 1.5px solid #e8eaf0;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-family: 'Inter', sans-serif;
+  color: #2b3040;
+  background: #fafbff;
+  outline: none;
+  transition: all 0.2s ease;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.gp-select-input {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238b92a6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+  cursor: pointer;
+}
+
+.gp-field input:focus,
+.gp-field select:focus,
+.gp-select-input:focus {
+  border-color: #5c60f5;
+  box-shadow: 0 0 0 3px rgba(92, 96, 245, 0.08);
+  background-color: #ffffff;
+}
+
+.gp-field.has-error input,
+.gp-field.has-error select {
+  border-color: #d84315;
+  background-color: #fff8f6;
+}
+
+.err {
+  font-size: 11px;
+  color: #d84315;
+  font-weight: 600;
+}
+
+.readonly-field input {
+  background: #f4f5fb !important;
+  color: #5c6275 !important;
+  cursor: not-allowed;
+  border-color: #eaecf4 !important;
+  font-weight: 600;
+}
+
+.readonly-field input.net-ok {
+  background: #f0faf4 !important;
+  color: #2e7d32 !important;
+  font-weight: 700;
+  border-color: #a5d6a7 !important;
+}
+
+/* ── Actions ─────────────────────────────────────────── */
+.gp-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.gp-btn-save,
+.gp-btn-export {
+  flex: 1;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.gp-btn-save {
+  background: #1a1e35;
+  color: #ffffff;
+}
+
+.gp-btn-save:hover {
+  background: #2b3050;
+  transform: translateY(-1px);
+}
+
+.gp-btn-save.saved {
+  background: #2e7d32;
+}
+
+.gp-btn-export {
+  background: #5c60f5;
+  color: #ffffff;
+}
+
+.gp-btn-export:hover:not(.disabled) {
+  background: #4044d6;
+  transform: translateY(-1px);
+}
+
+.gp-btn-export.disabled {
+  background: #d0d3f0;
+  color: #9097c4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.gp-hint {
+  font-size: 11.5px;
+  color: #8b92a6;
+  margin-top: 10px;
+  text-align: center;
+}
+
+/* ── Right: Enlarged Live Preview Panel ──────────────── */
+.gp-preview-panel {
+  flex: 1;
+  min-width: 440px;
+  position: sticky;
+  top: 24px;
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+}
+
+.gp-preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.gp-preview-title-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.gp-preview-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  color: #5c60f5;
+}
+
+.gp-preview-sub {
+  font-size: 12px;
+  color: #8b92a6;
+}
+
+.gp-eye-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  border: 1.5px solid #e8eaf0;
+  color: #5c60f5;
+  font-size: 12.5px;
+  font-weight: 700;
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+}
+
+.gp-eye-btn:hover {
+  background: #ececfd;
+  border-color: #5c60f5;
+  transform: translateY(-1px);
+}
+
+.gp-preview-bg {
+  background: #f0f2f8;
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  justify-content: stretch;
+  align-items: stretch;
+  border: 1px solid #eaecf4;
+  flex: 1;
+}
+
+/* ── The Printable Gate Pass Receipt Card ────────────── */
+.gate-pass-receipt {
+  width: 100%;
+  max-width: 100%;
+  background: #ffffff;
+  border: 1px solid #c9d0e0;
+  border-radius: 8px;
+  padding: 24px 26px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #1a1e35;
+  box-shadow: 0 6px 24px rgba(9, 13, 34, 0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.rcp-header {
+  text-align: center;
+}
+
+.rcp-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.rcp-badge {
+  background: #1a3065;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 4px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.rcp-phones {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #1a3065;
+}
+
+.rcp-company-name {
+  font-family: 'Outfit', 'Inter', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: #1a3065;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
+
+.rcp-address {
+  font-size: 10.5px;
+  color: #4a5068;
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+.rcp-hr {
+  height: 2px;
+  background: #1a3065;
+  margin: 12px 0;
+}
+
+.rcp-no-date {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.rcp-nd-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rcp-nd-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a3065;
+}
+
+.rcp-no-val {
+  font-size: 17px;
+  font-weight: 800;
+  color: #c62828;
+}
+
+.rcp-nd-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a1e35;
+}
+
+.rcp-field {
+  margin-bottom: 15px;
+}
+
+.rcp-field-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #4a5068;
+  margin-bottom: 4px;
+  letter-spacing: 0.2px;
+  word-spacing: 1px;
+}
+
+.rcp-field-line {
+  border-bottom: 1.5px solid #7a829e;
+  min-height: 30px;
+  display: flex;
+  align-items: flex-end;
+  padding-bottom: 6px;
+  /* Added comfortable bottom padding for values */
+}
+
+.rcp-field-line.rcp-with-unit {
+  justify-content: space-between;
+}
+
+.rcp-field-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a3065;
+  font-style: normal;
+  word-break: break-word;
+  line-height: 1.2;
+  padding-bottom: 2px;
+}
+
+.rcp-field-value.rcp-net {
+  color: #2e7d32;
+  font-weight: 800;
+}
+
+.rcp-unit {
+  font-size: 12px;
+  font-weight: 700;
+  color: #5c6275;
+}
+
+.rcp-sigs {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 18px;
+  gap: 20px;
+}
+
+.rcp-sig-col {
+  flex: 1;
+}
+
+.rcp-sig-right {
+  text-align: right;
+}
+
+.rcp-sig-content {
+  height: 28px;
+  display: flex;
+  align-items: flex-end;
+  padding-bottom: 2px;
+}
+
+.cursive-sig {
+  font-family: 'Georgia', serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 13px;
+  color: #1a3065;
+}
+
+.placeholder-sig {
+  color: #b0b8d0;
+  font-size: 12px;
+  justify-content: flex-end;
+}
+
+.rcp-sig-line-solid {
+  border-bottom: 1.5px solid #1a3065;
+  margin-top: 2px;
+  margin-bottom: 4px;
+}
+
+.rcp-sig-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #1a3065;
+  letter-spacing: 0.2px;
+}
+
+/* ── Fullscreen Modal Window ──────────────────────────── */
+.gp-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 18, 35, 0.65);
+  backdrop-filter: blur(5px);
+  z-index: 2500;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  animation: modalFade 0.2s ease;
+}
+
+@keyframes modalFade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.gp-modal-box {
+  background: #ffffff;
+  border-radius: 20px;
+  width: 580px;
+  max-width: 100%;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 24px 72px rgba(0, 0, 0, 0.25);
+}
+
+.gp-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 26px;
+  border-bottom: 1px solid #eaecf4;
+  background: #ffffff;
+}
+
+.gp-modal-title {
+  display: flex;
+  flex-direction: column;
+}
+
+.gp-modal-title span:first-child {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: 17px;
+  color: #1a1e35;
+}
+
+.gp-modal-sub {
+  font-size: 12px;
+  color: #8b92a6;
+}
+
+.gp-modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.gp-modal-export {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #5c60f5;
+  color: #ffffff;
+  border: none;
+  padding: 9px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.gp-modal-export:hover:not(.disabled) {
+  background: #4044d6;
+}
+
+.gp-modal-export.disabled {
+  background: #d0d3f0;
+  color: #9097c4;
+  cursor: not-allowed;
+}
+
+.gp-modal-close {
+  background: none;
+  border: none;
+  color: #8b92a6;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.gp-modal-close:hover {
+  color: #1a1e35;
+  background: #f0f2f8;
+}
+
+.gp-modal-body {
+  padding: 36px;
+  background: #f0f2f8;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.gp-modal-body .modal-receipt {
+  max-width: 440px;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.12);
+}
+
+/* ── Responsive Scaling ───────────────────────────────── */
+@media (max-width: 1100px) {
+  .gp-page {
+    flex-direction: column;
+  }
+
+  .gp-preview-panel {
+    width: 100%;
+    min-width: 0;
+    position: static;
+  }
+}
+
+/* ── Party Autocomplete Dropdown ──────────────────────── */
+.gp-autocomplete-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 99999;
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 14px;
+  box-shadow: 0 12px 36px rgba(9, 13, 34, 0.16);
+  overflow: hidden;
+  animation: acFadeIn 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+@keyframes acFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.gp-autocomplete-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid #f1f5f9;
+  transition: background 0.12s ease;
+}
+
+.gp-autocomplete-item:last-child {
+  border-bottom: none;
+}
+
+.gp-autocomplete-item:hover,
+.gp-autocomplete-item.highlighted {
+  background: #f5f6ff;
+}
+
+.gp-ac-name {
+  font-weight: 700;
+  font-size: 13.5px;
+  color: #1a1e35;
+  flex: 1;
+}
+
+.gp-ac-vehicle {
+  font-size: 12px;
+  font-weight: 700;
+  background: #ede9fe;
+  color: #7c3aed;
+  border-radius: 20px;
+  padding: 2px 10px;
+  white-space: nowrap;
+}
+
+.gp-ac-village {
+  font-size: 11.5px;
+  font-weight: 600;
+  background: #f0fdf4;
+  color: #16a34a;
+  border-radius: 20px;
+  padding: 2px 10px;
+  white-space: nowrap;
+}
+
+/* ── Mobile Form & Modal Responsiveness ─────────────────────────────── */
+@media (max-width: 768px) {
+  .gp-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .gp-actions {
+    flex-direction: column;
+  }
+
+  .gp-btn-save,
+  .gp-btn-export {
+    width: 100%;
+  }
+
+  .gp-form-panel {
+    padding: 20px 16px;
+  }
+
+  .users-modal-body .gp-page.gp-modal-layout {
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .users-modal-body .gp-page.gp-modal-layout .gp-preview-panel {
+    min-width: 100%;
+  }
+}

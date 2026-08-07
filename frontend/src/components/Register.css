@@ -1,0 +1,60 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   Register Page — Additional Styles
+   Extends the shared auth design system from Login.css
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Register page uses all shared .auth-* classes from Login.css.
+   This file only contains register-specific additions. */
+
+/* ── Compact form gap for register (more fields) ─────────────────────── */
+.auth-form--register {
+  gap: 18px;
+}
+
+/* ── Password Strength Meter (register-specific) ─────────────────────── */
+.auth-strength-meter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.auth-strength-bars {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+}
+
+.auth-strength-bar {
+  height: 4px;
+  flex: 1;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.auth-strength-bar.active {
+  transform: scaleY(1.3);
+}
+
+.auth-strength-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  min-width: 55px;
+  text-align: right;
+  transition: color 0.3s ease;
+}
+
+/* ── Password Match Indicator ────────────────────────────────────────── */
+.auth-confirm-check {
+  position: absolute;
+  right: 48px;
+  color: #22c55e;
+  z-index: 2;
+  animation: authCheckPop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes authCheckPop {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}

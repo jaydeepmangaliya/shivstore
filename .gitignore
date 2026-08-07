@@ -1,0 +1,29 @@
+# ============================================================
+# Shiv-Store — .gitignore
+# ============================================================
+
+# ── SECRETS — Never commit these ────────────────────────────
+.env
+.env.local
+.env.production
+
+# ── Backend Build Output ─────────────────────────────────────
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+
+# ── Frontend Build Output ────────────────────────────────────
+frontend/dist/
+frontend/node_modules/
+frontend/.env
+frontend/.env.local
+
+# ── IDE & OS Files ───────────────────────────────────────────
+.vscode/settings.json
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
+
+# ── Logs ─────────────────────────────────────────────────────
+*.log
+logs/
