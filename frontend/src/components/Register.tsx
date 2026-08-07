@@ -156,7 +156,26 @@ export const Register: React.FC = () => {
       <div className="auth-brand-panel">
         <div className="auth-brand-content">
           <div className="auth-brand-logo">
-            <span className="auth-brand-logo-letter">S</span>
+            <svg width="46" height="46" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="auth-brand-svg-logo">
+              <defs>
+                <linearGradient id="sLogoGradReg" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stopColor="#ffffff" />
+                  <stop offset="100%" stopColor="#e0e7ff" />
+                </linearGradient>
+                <filter id="logoGlowFilterReg" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="3" stdDeviation="3.5" floodColor="#000000" floodOpacity="0.3" />
+                </filter>
+              </defs>
+              <path
+                d="M32 14C32 10.6863 29.3137 8 26 8H18C13.5817 8 10 11.5817 10 16C10 20.4183 13.5817 24 18 24H30C34.4183 24 38 27.5817 38 32C38 36.4183 34.4183 40 30 40H22C18.6863 40 16 37.3137 16 34"
+                stroke="url(#sLogoGradReg)"
+                strokeWidth="5.5"
+                strokeLinecap="round"
+                filter="url(#logoGlowFilterReg)"
+              />
+              <circle cx="35" cy="11" r="2.5" fill="#a78bfa" />
+              <circle cx="13" cy="37" r="2.5" fill="#6366f1" />
+            </svg>
           </div>
           <h1 className="auth-brand-title">SHIVSTORE</h1>
           <p className="auth-brand-tagline">

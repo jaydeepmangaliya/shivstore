@@ -162,31 +162,40 @@
 }
 
 .auth-brand-logo {
-  width: 80px;
-  height: 80px;
-  border-radius: 24px;
-  background: var(--auth-brand-gradient);
+  width: 88px;
+  height: 88px;
+  border-radius: 28px;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #9333ea 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 32px;
+  border: 1.5px solid rgba(255, 255, 255, 0.28);
   box-shadow:
-    0 16px 40px rgba(99, 102, 241, 0.3),
-    0 0 0 1px rgba(255, 255, 255, 0.1);
+    0 20px 45px rgba(99, 102, 241, 0.45),
+    inset 0 2px 4px rgba(255, 255, 255, 0.4),
+    0 0 0 8px rgba(99, 102, 241, 0.12);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   animation: authLogoGlow 4s ease-in-out infinite alternate;
 }
 
 @keyframes authLogoGlow {
-  0% { box-shadow: 0 16px 40px rgba(99, 102, 241, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1); }
-  100% { box-shadow: 0 20px 50px rgba(139, 92, 246, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.15); }
+  0% {
+    box-shadow:
+      0 20px 45px rgba(99, 102, 241, 0.45),
+      inset 0 2px 4px rgba(255, 255, 255, 0.4),
+      0 0 0 8px rgba(99, 102, 241, 0.12);
+  }
+  100% {
+    box-shadow:
+      0 26px 55px rgba(139, 92, 246, 0.6),
+      inset 0 2px 4px rgba(255, 255, 255, 0.5),
+      0 0 0 12px rgba(139, 92, 246, 0.18);
+  }
 }
 
-.auth-brand-logo-letter {
-  font-family: 'Outfit', sans-serif;
-  font-size: 40px;
-  font-weight: 800;
-  color: #ffffff;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+.auth-brand-svg-logo {
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.3));
 }
 
 .auth-brand-title {
