@@ -289,7 +289,6 @@ export const VehicleOverview: React.FC = () => {
                   <tr>
                     <th>Rank / Vehicle No.</th>
                     <th style={{ textAlign: 'center' }}>Total Trips</th>
-                    <th style={{ textAlign: 'right' }}>Cumulative Weight (kg)</th>
                     <th style={{ textAlign: 'right' }}>Total Net Tons</th>
                     <th>Last Active Date</th>
                     <th style={{ textAlign: 'center' }}>Action</th>
@@ -309,9 +308,6 @@ export const VehicleOverview: React.FC = () => {
                         </td>
                         <td style={{ textAlign: 'center', fontWeight: 700 }}>
                           <span className="vo-trips-badge">{v.totalTrips} Trips</span>
-                        </td>
-                        <td style={{ textAlign: 'right', fontWeight: 600, color: '#334155' }}>
-                          {v.totalWeightKg.toLocaleString()} kg
                         </td>
                         <td style={{ textAlign: 'right', fontWeight: 800, color: '#059669', fontSize: '14px' }}>
                           {v.totalTons.toFixed(2)} Tons

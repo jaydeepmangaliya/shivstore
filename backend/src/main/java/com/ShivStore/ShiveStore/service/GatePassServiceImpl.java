@@ -251,7 +251,8 @@ public class GatePassServiceImpl implements GatePassService {
 
             long totalTrips = passes.size();
             double totalWeightKg = passes.stream().mapToDouble(p -> p.getNetWeight() != null ? p.getNetWeight() : 0.0).sum();
-            double totalTons = Math.round(totalWeightKg / 1000.0 * 100.0) / 100.0;
+            double totalTons = passes.stream().mapToDouble(p -> p.getNetTons() != null ? p.getNetTons() : (p.getNetWeight() != null ? p.getNetWeight() / 1000.0 : 0.0)).sum();
+            totalTons = Math.round(totalTons * 100.0) / 100.0;
             String lastDispatchDate = passes.get(0).getDate();
 
             Map<String, Double> materialBreakdown = new HashMap<>();
