@@ -10,7 +10,8 @@ import {
   User,
   FileText,
   TrendingDown,
-  LogOut
+  LogOut,
+  X
 } from 'lucide-react';
 import { fetchDashboardRevenue, fetchDashboardOrders } from '../services/api';
 import './Dashboard.css';
@@ -76,6 +77,13 @@ export const Dashboard: React.FC = () => {
     return { start, end };
   };
 
+  const parseISO = (str: string): Date | null => {
+    if (!str || !str.includes('-')) return null;
+    const [y, m, d] = str.split('-').map(Number);
+    if (y && m && d) return new Date(y, m - 1, d);
+    return null;
+  };
+
   const initialCurrentMonth = getCurrentMonthRange();
 
   // Filter mode: 'Last Week' | 'Last Month' | 'Custom'
@@ -91,6 +99,37 @@ export const Dashboard: React.FC = () => {
   const [pendingRangeEnd, setPendingRangeEnd] = useState<Date | null>(initialCurrentMonth.end);
   const [pendingMonth, setPendingMonth] = useState<number>(initialCurrentMonth.start.getMonth());
   const [pendingYear, setPendingYear] = useState<number>(initialCurrentMonth.start.getFullYear());
+
+  const defaultMonthRange = getCurrentMonthRange();
+  const defaultMonthTitle = `Current Month (${monthLongNames[defaultMonthRange.start.getMonth()]} ${defaultMonthRange.start.getFullYear()})`;
+  const hasNonDefaultFilter = activeDateRange.title !== defaultMonthTitle;
+
+  const handleToggleFilter = () => {
+    if (!isFilterOpen) {
+      const s = parseISO(activeDateRange.startDate) || initialCurrentMonth.start;
+      const e = parseISO(activeDateRange.endDate) || initialCurrentMonth.end;
+      setPendingRangeStart(s);
+      setPendingRangeEnd(e);
+      setPendingMonth(s.getMonth());
+      setPendingYear(s.getFullYear());
+    }
+    setIsFilterOpen(!isFilterOpen);
+  };
+
+  const handleResetFilter = () => {
+    const cur = getCurrentMonthRange();
+    setActiveDateRange({
+      startDate: formatDateISO(cur.start),
+      endDate: formatDateISO(cur.end),
+      title: `Current Month (${monthLongNames[cur.start.getMonth()]} ${cur.start.getFullYear()})`
+    });
+    setCalendarMode('Custom');
+    setPendingRangeStart(cur.start);
+    setPendingRangeEnd(cur.end);
+    setPendingMonth(cur.start.getMonth());
+    setPendingYear(cur.start.getFullYear());
+    setIsFilterOpen(false); // Close calendar popover immediately
+  };
 
   // Forms Created year filter
   const [orderYear, setOrderYear] = useState<number>(currentYear);
@@ -364,11 +403,11 @@ export const Dashboard: React.FC = () => {
               <div className="filter-wrapper">
                 <button
                   className={`btn-filter ${isFilterOpen ? 'active' : ''}`}
-                  onClick={() => setIsFilterOpen(!isFilterOpen)}
+                  onClick={handleToggleFilter}
                 >
                   <Filter size={14} />
                   <span>Filter</span>
-                  {activeDateRange.title !== `Current Month (${monthLongNames[initialCurrentMonth.start.getMonth()]} ${initialCurrentMonth.start.getFullYear()})` && (
+                  {hasNonDefaultFilter && (
                     <span className="filter-active-dot" />
                   )}
                 </button>
@@ -392,25 +431,14 @@ export const Dashboard: React.FC = () => {
                       <button className="btn-apply" onClick={handleApplyFilter}>
                         Apply
                       </button>
-                      <button
-                        className="btn-reset-ton-filter"
-                        onClick={() => {
-                          const cur = getCurrentMonthRange();
-                          setActiveDateRange({
-                            startDate: formatDateISO(cur.start),
-                            endDate: formatDateISO(cur.end),
-                            title: `Current Month (${monthLongNames[cur.start.getMonth()]} ${cur.start.getFullYear()})`
-                          });
-                          setCalendarMode('Custom');
-                          setPendingRangeStart(cur.start);
-                          setPendingRangeEnd(cur.end);
-                          setPendingMonth(cur.start.getMonth());
-                          setPendingYear(cur.start.getFullYear());
-                          setIsFilterOpen(false);
-                        }}
-                      >
-                        ✕ Reset Filter
-                      </button>
+                      {hasNonDefaultFilter && (
+                        <button
+                          className="btn-reset-ton-filter"
+                          onClick={handleResetFilter}
+                        >
+                          <X size={13} /> Reset Filter
+                        </button>
+                      )}
                     </div>
 
                     {/* Right Calendar Panel */}
