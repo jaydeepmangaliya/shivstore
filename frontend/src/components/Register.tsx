@@ -168,26 +168,6 @@ export const Register: React.FC = () => {
           <p className="auth-brand-tagline">
             Create your account to start managing gate passes, billing, and analytics.
           </p>
-
-          {/* Abstract decorative pattern */}
-          <div
-            className="auth-brand-decoration"
-            style={{
-              transform: `perspective(1000px) rotateY(${mousePos.x * 15}deg) rotateX(${-mousePos.y * 15}deg)`,
-              transition: 'transform 0.1s ease-out',
-            }}
-          >
-            <div className="auth-deco-ring auth-deco-ring-1" />
-            <div className="auth-deco-ring auth-deco-ring-2" />
-            <div className="auth-deco-ring auth-deco-ring-3" />
-            <div className="auth-deco-dot auth-deco-dot-1" />
-            <div className="auth-deco-dot auth-deco-dot-2" />
-            <div className="auth-deco-dot auth-deco-dot-3" />
-            <div className="auth-deco-dot auth-deco-dot-4" />
-            <div className="auth-deco-dot auth-deco-dot-5" />
-            <div className="auth-deco-line auth-deco-line-1" />
-            <div className="auth-deco-line auth-deco-line-2" />
-          </div>
         </div>
       </div>
 
