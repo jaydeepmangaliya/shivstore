@@ -151,9 +151,23 @@ export const Login: React.FC = () => {
         </div>
       </div>
 
-      {/* Form Panel — Right Side */}
+      {/* Form Panel — Right Side with 3D Glassmorphism Tilt */}
       <div className="auth-form-panel">
-        <div className="auth-card">
+        <div
+          className="auth-card"
+          style={{
+            transform: `perspective(1000px) rotateY(${mousePos.x * 7}deg) rotateX(${-mousePos.y * 7}deg)`,
+            transition: 'transform 0.12s ease-out, box-shadow 0.3s ease',
+          }}
+        >
+          {/* Dynamic Specular Light Shine Reflection */}
+          <div
+            className="auth-card-shine"
+            style={{
+              background: `radial-gradient(circle at ${((mousePos.x + 1) * 50).toFixed(1)}% ${((mousePos.y + 1) * 50).toFixed(1)}%, rgba(255, 255, 255, 0.16) 0%, rgba(99, 102, 241, 0.06) 45%, transparent 70%)`,
+            }}
+          />
+
           <div className="auth-card-header">
             <h2 className="auth-card-title">Welcome back</h2>
             <p className="auth-card-subtitle">Enter your credentials to access your dashboard</p>

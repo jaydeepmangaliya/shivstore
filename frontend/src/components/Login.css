@@ -378,7 +378,21 @@
   padding: 44px 40px;
   box-shadow: var(--auth-card-shadow);
   position: relative;
+  overflow: hidden;
+  transform-style: preserve-3d;
   animation: authCardAppear 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Dynamic Specular Light Shine Reflection */
+.auth-card-shine {
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.9;
+  mix-blend-mode: overlay;
+  transition: background 0.1s ease-out;
 }
 
 /* Gradient border glow effect */
