@@ -85,7 +85,7 @@ export const ForgotPassword: React.FC = () => {
           </div>
 
           {isSubmitted ? (
-            <div style={{ textContent: 'center', textAlign: 'center', padding: '12px 0' }}>
+            <div style={{ textAlign: 'center', padding: '12px 0' }}>
               <div style={{
                 width: 60,
                 height: 60,
