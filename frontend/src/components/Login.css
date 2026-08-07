@@ -53,14 +53,47 @@
   100% { opacity: 0.8; transform: scale(1); }
 }
 
+/* ── Dynamic Mouse Cursor Spotlight & Floating Particle ──────────────────── */
+.auth-mouse-spotlight {
+  position: fixed;
+  width: 650px;
+  height: 650px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(99, 102, 241, 0.22) 0%,
+    rgba(139, 92, 246, 0.1) 35%,
+    rgba(167, 139, 250, 0.03) 60%,
+    transparent 75%
+  );
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition: left 0.08s ease-out, top 0.08s ease-out;
+  z-index: 2;
+  mix-blend-mode: screen;
+}
+
+.auth-mouse-dot {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #a78bfa;
+  box-shadow: 0 0 16px #6366f1, 0 0 30px #8b5cf6, 0 0 45px rgba(167, 139, 250, 0.8);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition: left 0.03s ease-out, top 0.03s ease-out;
+  z-index: 9999;
+}
+
 /* ── Floating Orbs ──────────────────────────────────────────────────────── */
 .auth-orb {
   position: absolute;
   border-radius: 50%;
   filter: blur(80px);
   pointer-events: none;
-  opacity: 0;
-  animation: authOrbFloat 8s ease-in-out infinite;
+  transition: transform 0.2s ease-out;
+  opacity: 0.7;
 }
 
 .auth-orb-1 {

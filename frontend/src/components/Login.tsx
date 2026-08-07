@@ -61,18 +61,66 @@ export const Login: React.FC = () => {
     }
   };
 
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const { innerWidth, innerHeight } = window;
+    const x = (e.clientX - innerWidth / 2) / (innerWidth / 2);
+    const y = (e.clientY - innerHeight / 2) / (innerHeight / 2);
+    setMousePos({ x, y });
+    setCursorPos({ x: e.clientX, y: e.clientY });
+  };
+
   return (
-    <div className="auth-page">
+    <div className="auth-page" onMouseMove={handleMouseMove}>
+      {/* Dynamic Cursor Spotlight Follower */}
+      <div
+        className="auth-mouse-spotlight"
+        style={{
+          left: `${cursorPos.x}px`,
+          top: `${cursorPos.y}px`,
+        }}
+      />
+      <div
+        className="auth-mouse-dot"
+        style={{
+          left: `${cursorPos.x}px`,
+          top: `${cursorPos.y}px`,
+        }}
+      />
+
       {/* Background Effects */}
       <div className="auth-bg-gradient" />
       <div className="auth-grid-overlay" />
-      <div className="auth-orb auth-orb-1" />
-      <div className="auth-orb auth-orb-2" />
-      <div className="auth-orb auth-orb-3" />
+      <div
+        className="auth-orb auth-orb-1"
+        style={{
+          transform: `translate(${mousePos.x * 45}px, ${mousePos.y * 45}px)`,
+        }}
+      />
+      <div
+        className="auth-orb auth-orb-2"
+        style={{
+          transform: `translate(${mousePos.x * -55}px, ${mousePos.y * -55}px)`,
+        }}
+      />
+      <div
+        className="auth-orb auth-orb-3"
+        style={{
+          transform: `translate(${mousePos.x * 35}px, ${mousePos.y * -35}px)`,
+        }}
+      />
 
-      {/* Brand Panel — Left Side */}
+      {/* Brand Panel — Left Side with 3D Parallax */}
       <div className="auth-brand-panel">
-        <div className="auth-brand-content">
+        <div
+          className="auth-brand-content"
+          style={{
+            transform: `perspective(1000px) rotateY(${mousePos.x * 8}deg) rotateX(${-mousePos.y * 8}deg)`,
+            transition: 'transform 0.1s ease-out',
+          }}
+        >
           <div className="auth-brand-logo">
             <span className="auth-brand-logo-letter">S</span>
           </div>
@@ -82,7 +130,13 @@ export const Login: React.FC = () => {
           </p>
 
           {/* Abstract decorative pattern */}
-          <div className="auth-brand-decoration">
+          <div
+            className="auth-brand-decoration"
+            style={{
+              transform: `perspective(1000px) rotateY(${mousePos.x * 15}deg) rotateX(${-mousePos.y * 15}deg)`,
+              transition: 'transform 0.1s ease-out',
+            }}
+          >
             <div className="auth-deco-ring auth-deco-ring-1" />
             <div className="auth-deco-ring auth-deco-ring-2" />
             <div className="auth-deco-ring auth-deco-ring-3" />
