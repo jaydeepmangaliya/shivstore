@@ -11,10 +11,10 @@ services:
     ports:
       - "3001:3001"
     environment:
-      - MONGODB_URI=${MONGODB_URI}
-      - JWT_SECRET=${JWT_SECRET}
-      - GMAIL_USERNAME=${GMAIL_USERNAME}
-      - GMAIL_APP_PASSWORD=${GMAIL_APP_PASSWORD}
+      - MONGODB_URI=${MONGODB_URI:-mongodb+srv://brandstore111111_db_user:1pLQbJVtQXEY070x@cluster0.b146y9k.mongodb.net/shiv_store_db?retryWrites=true&w=majority}
+      - JWT_SECRET=${JWT_SECRET:-ShivStoreSecretKeyForJWTAuthenticationMustBeAtLeast256BitsLong2026}
+      - GMAIL_USERNAME=${GMAIL_USERNAME:-}
+      - GMAIL_APP_PASSWORD=${GMAIL_APP_PASSWORD:-}
     networks:
       - shivstore-network
 

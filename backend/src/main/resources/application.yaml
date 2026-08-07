@@ -4,8 +4,8 @@ spring:
 
   data:
     mongodb:
-      # MongoDB Atlas — override with MONGODB_URI env var in production
-      uri: ${MONGODB_URI:mongodb+srv://brandstore111111_db_user:1pLQbJVtQXEY070x@cluster0.b146y9k.mongodb.net/shiv_store_db?retryWrites=true&w=majority}
+      # MongoDB Atlas connection URI
+      uri: mongodb+srv://brandstore111111_db_user:1pLQbJVtQXEY070x@cluster0.b146y9k.mongodb.net/shiv_store_db?retryWrites=true&w=majority
 
   # Gmail SMTP Configuration for Password Reset Emails
   mail:
