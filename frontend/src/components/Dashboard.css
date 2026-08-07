@@ -796,7 +796,8 @@ body {
 }
 
 .bubble:hover {
-  transform: scale(1.08) z-index: 10;
+  transform: scale(1.08);
+  z-index: 10;
 }
 
 .bubble-hygiene {
