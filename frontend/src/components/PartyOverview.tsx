@@ -817,36 +817,38 @@ export const PartyOverview: React.FC = () => {
                 {/* Section 1: Material Dispatch Summary Table */}
                 <div className="po-bill-section-block">
                   <h4 className="po-bill-section-title">MATERIAL DISPATCH SUMMARY</h4>
-                  <table className="po-bill-table">
-                    <thead>
-                      <tr>
-                        <th>Material Type</th>
-                        <th style={{ textAlign: 'center' }}>Total Dispatches</th>
-                        <th style={{ textAlign: 'right' }}>Cumulative Weight (kg)</th>
-                        <th style={{ textAlign: 'right' }}>Total Net Tons</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {materialSummaries.length === 0 ? (
+                  <div className="po-bill-table-responsive">
+                    <table className="po-bill-table">
+                      <thead>
                         <tr>
-                          <td colSpan={4} style={{ textAlign: 'center', padding: '20px', color: '#8b92a6' }}>
-                            No material dispatches found for selected period.
-                          </td>
+                          <th>Material Type</th>
+                          <th style={{ textAlign: 'center' }}>Total Dispatches</th>
+                          <th style={{ textAlign: 'right' }}>Cumulative Weight (kg)</th>
+                          <th style={{ textAlign: 'right' }}>Total Net Tons</th>
                         </tr>
-                      ) : (
-                        materialSummaries.map((ms, i) => (
-                          <tr key={i}>
-                            <td style={{ fontWeight: 700, color: '#1a1e35' }}>{ms.material}</td>
-                            <td style={{ textAlign: 'center', fontWeight: 600 }}>{ms.count} Trips</td>
-                            <td style={{ textAlign: 'right', fontWeight: 600 }}>{ms.weightKg.toLocaleString()} kg</td>
-                            <td style={{ textAlign: 'right', fontWeight: 700, color: '#059669' }}>
-                              {ms.tons.toFixed(2)} Tons
+                      </thead>
+                      <tbody>
+                        {materialSummaries.length === 0 ? (
+                          <tr>
+                            <td colSpan={4} style={{ textAlign: 'center', padding: '20px', color: '#8b92a6' }}>
+                              No material dispatches found for selected period.
                             </td>
                           </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
+                        ) : (
+                          materialSummaries.map((ms, i) => (
+                            <tr key={i}>
+                              <td style={{ fontWeight: 700, color: '#1a1e35' }}>{ms.material}</td>
+                              <td style={{ textAlign: 'center', fontWeight: 600 }}>{ms.count} Trips</td>
+                              <td style={{ textAlign: 'right', fontWeight: 600 }}>{ms.weightKg.toLocaleString()} kg</td>
+                              <td style={{ textAlign: 'right', fontWeight: 700, color: '#059669' }}>
+                                {ms.tons.toFixed(2)} Tons
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
 
                 {/* Statement Summary & Totals */}

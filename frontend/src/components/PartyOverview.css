@@ -299,6 +299,12 @@
   text-transform: uppercase;
 }
 
+.po-bill-table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .po-bill-table {
   width: 100%;
   border-collapse: collapse;
@@ -758,7 +764,23 @@
   }
 
   .po-bill-card {
-    padding: 20px 18px;
+    padding: 18px 10px !important;
+  }
+
+  .po-bill-table {
+    width: 100% !important;
+    font-size: 11px !important;
+  }
+
+  .po-bill-table th,
+  .po-bill-table td {
+    padding: 8px 4px !important;
+    font-size: 11px !important;
+  }
+
+  .po-bill-table th {
+    font-size: 10px !important;
+    line-height: 1.2 !important;
   }
 
   .po-bill-company {
