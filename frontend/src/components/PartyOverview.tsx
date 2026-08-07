@@ -681,8 +681,8 @@ export const PartyOverview: React.FC = () => {
                 <h2 className="users-modal-title">View &amp; Edit Gate Pass #{selectedRecord.no}</h2>
                 <p className="users-modal-subtitle">Update fields, save changes, or export to PDF</p>
               </div>
-              <button className="users-modal-close" onClick={() => setIsEditModalOpen(false)}>
-                ✕
+              <button className="users-modal-close" onClick={() => setIsEditModalOpen(false)} aria-label="Close">
+                <X size={18} />
               </button>
             </div>
             <div className="users-modal-body">
@@ -712,8 +712,8 @@ export const PartyOverview: React.FC = () => {
                   <p className="po-bill-modal-sub">Generate customized dispatch statement for {decodedName}</p>
                 </div>
               </div>
-              <button className="users-modal-close" onClick={() => setIsBillModalOpen(false)}>
-                ✕
+              <button className="users-modal-close" onClick={() => setIsBillModalOpen(false)} aria-label="Close">
+                <X size={18} />
               </button>
             </div>
 
