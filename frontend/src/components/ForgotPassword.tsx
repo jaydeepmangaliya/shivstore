@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Mail, ArrowRight, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { forgotPassword } from '../services/api';
 import { useToast } from './Toast';
+import { ParticleCanvas } from './ParticleCanvas';
 import './Login.css';
 
 export const ForgotPassword: React.FC = () => {
@@ -11,6 +12,17 @@ export const ForgotPassword: React.FC = () => {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const { innerWidth, innerHeight } = window;
+    const x = (e.clientX - innerWidth / 2) / (innerWidth / 2);
+    const y = (e.clientY - innerHeight / 2) / (innerHeight / 2);
+    setMousePos({ x, y });
+    setCursorPos({ x: e.clientX, y: e.clientY });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,43 +50,91 @@ export const ForgotPassword: React.FC = () => {
   };
 
   return (
-    <div className="auth-page">
+    <div className="auth-page" onMouseMove={handleMouseMove}>
+      {/* Interactive Background Particle Constellation Canvas */}
+      <ParticleCanvas />
+
+      {/* Dynamic Cursor Spotlight Follower */}
+      <div
+        className="auth-mouse-spotlight"
+        style={{
+          left: `${cursorPos.x}px`,
+          top: `${cursorPos.y}px`,
+        }}
+      />
+      <div
+        className="auth-mouse-dot"
+        style={{
+          left: `${cursorPos.x}px`,
+          top: `${cursorPos.y}px`,
+        }}
+      />
+
       {/* Background Effects */}
       <div className="auth-bg-gradient" />
       <div className="auth-grid-overlay" />
-      <div className="auth-orb auth-orb-1" />
-      <div className="auth-orb auth-orb-2" />
-      <div className="auth-orb auth-orb-3" />
+      <div
+        className="auth-orb auth-orb-1"
+        style={{
+          transform: `translate(${mousePos.x * 45}px, ${mousePos.y * 45}px)`,
+        }}
+      />
+      <div
+        className="auth-orb auth-orb-2"
+        style={{
+          transform: `translate(${mousePos.x * -55}px, ${mousePos.y * -55}px)`,
+        }}
+      />
+      <div
+        className="auth-orb auth-orb-3"
+        style={{
+          transform: `translate(${mousePos.x * 35}px, ${mousePos.y * -35}px)`,
+        }}
+      />
 
       {/* Brand Panel — Left Side */}
       <div className="auth-brand-panel">
         <div className="auth-brand-content">
           <div className="auth-brand-logo">
-            <span className="auth-brand-logo-letter">S</span>
+            <svg width="46" height="46" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="auth-brand-svg-logo">
+              <defs>
+                <linearGradient id="sLogoGradForgot" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stopColor="#ffffff" />
+                  <stop offset="100%" stopColor="#e0e7ff" />
+                </linearGradient>
+                <filter id="logoGlowFilterForgot" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="3" stdDeviation="3.5" floodColor="#000000" floodOpacity="0.3" />
+                </filter>
+              </defs>
+              <path
+                d="M32 14C32 10.6863 29.3137 8 26 8H18C13.5817 8 10 11.5817 10 16C10 20.4183 13.5817 24 18 24H30C34.4183 24 38 27.5817 38 32C38 36.4183 34.4183 40 30 40H22C18.6863 40 16 37.3137 16 34"
+                stroke="url(#sLogoGradForgot)"
+                strokeWidth="5.5"
+                strokeLinecap="round"
+                filter="url(#logoGlowFilterForgot)"
+              />
+              <circle cx="35" cy="11" r="2.5" fill="#a78bfa" />
+              <circle cx="13" cy="37" r="2.5" fill="#6366f1" />
+            </svg>
           </div>
           <h1 className="auth-brand-title">SHIVSTORE</h1>
           <p className="auth-brand-tagline">
             Account recovery system.
           </p>
-
-          <div className="auth-brand-decoration">
-            <div className="auth-deco-ring auth-deco-ring-1" />
-            <div className="auth-deco-ring auth-deco-ring-2" />
-            <div className="auth-deco-ring auth-deco-ring-3" />
-            <div className="auth-deco-dot auth-deco-dot-1" />
-            <div className="auth-deco-dot auth-deco-dot-2" />
-            <div className="auth-deco-dot auth-deco-dot-3" />
-            <div className="auth-deco-dot auth-deco-dot-4" />
-            <div className="auth-deco-dot auth-deco-dot-5" />
-            <div className="auth-deco-line auth-deco-line-1" />
-            <div className="auth-deco-line auth-deco-line-2" />
-          </div>
         </div>
       </div>
 
       {/* Form Panel — Right Side */}
       <div className="auth-form-panel">
         <div className="auth-card">
+          {/* Dynamic Specular Light Shine Reflection */}
+          <div
+            className="auth-card-shine"
+            style={{
+              background: `radial-gradient(circle at ${((mousePos.x + 1) * 50).toFixed(1)}% ${((mousePos.y + 1) * 50).toFixed(1)}%, rgba(255, 255, 255, 0.16) 0%, rgba(99, 102, 241, 0.06) 45%, transparent 70%)`,
+            }}
+          />
+
           <div className="auth-card-header">
             <h2 className="auth-card-title">Reset Password</h2>
             <p className="auth-card-subtitle">
@@ -85,25 +145,14 @@ export const ForgotPassword: React.FC = () => {
           </div>
 
           {isSubmitted ? (
-            <div style={{ textAlign: 'center', padding: '12px 0' }}>
-              <div style={{
-                width: 60,
-                height: 60,
-                borderRadius: '50%',
-                background: 'rgba(34, 197, 94, 0.15)',
-                color: '#22c55e',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                margin: '0 auto 20px',
-                border: '1px solid rgba(34, 197, 94, 0.3)'
-              }}>
+            <div className="reset-success-box">
+              <div className="reset-success-icon">
                 <CheckCircle2 size={32} />
               </div>
-              <p style={{ color: '#f1f5f9', fontSize: 15, fontWeight: 600, marginBottom: 8 }}>
+              <p className="reset-success-title">
                 Reset Link Sent!
               </p>
-              <p style={{ color: '#94a3b8', fontSize: 13.5, lineHeight: 1.5, marginBottom: 28 }}>
+              <p className="reset-success-desc">
                 We have sent a reset link to <strong style={{ color: '#6366f1' }}>{email}</strong>. The link is valid for 15 minutes.
               </p>
 
