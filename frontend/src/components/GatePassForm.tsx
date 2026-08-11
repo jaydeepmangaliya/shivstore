@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-import { X, Download, Save, CheckCircle2 } from 'lucide-react';
+import { X, Download, Save, CheckCircle2, Printer } from 'lucide-react';
 import { fetchNextPassNo, createGatePass, updateGatePass, fetchGatePasses } from '../services/api';
 import type { GatePassDTO } from '../services/api';
 import './GatePass.css';
@@ -106,6 +106,11 @@ const GatePassForm: React.FC<GatePassFormProps> = ({ initialRecord, onSaved, hid
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [exporting, setExporting] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+
+  // ── Copies Selection Modal State ─────────────────────────────────────────
+  const [copiesModalOpen, setCopiesModalOpen] = useState(false);
+  const [copiesCount, setCopiesCount] = useState<1 | 2>(2); // Pre-selected default = 2 copies
+  const [targetExportRef, setTargetExportRef] = useState<React.RefObject<HTMLDivElement | null> | null>(null);
 
   // ── Party Autocomplete State ─────────────────────────────────────────────
   interface PartySuggestion {
@@ -275,14 +280,22 @@ const GatePassForm: React.FC<GatePassFormProps> = ({ initialRecord, onSaved, hid
     }
   };
 
-  const exportPDF = async (ref: React.RefObject<HTMLDivElement | null>) => {
+  const openCopiesModal = (ref: React.RefObject<HTMLDivElement | null>) => {
     if (!ref.current || !saved) return;
+    setTargetExportRef(ref);
+    setCopiesCount(2); // Always pre-select 2 copies by default
+    setCopiesModalOpen(true);
+  };
+
+  const executeExportPDF = async (ref: React.RefObject<HTMLDivElement | null> | null, copies: 1 | 2) => {
+    if (!ref?.current || !saved) return;
     setExporting(true);
+    setCopiesModalOpen(false);
     const element = ref.current;
     try {
       element.classList.add('rendering-pdf');
       const canvas = await html2canvas(element, {
-        scale: 2, // 2x scale for 300 DPI crispness at ~120KB
+        scale: 2, // 2x scale for 300 DPI crispness
         useCORS: true,
         backgroundColor: '#ffffff',
         windowWidth: 1000,
@@ -292,18 +305,62 @@ const GatePassForm: React.FC<GatePassFormProps> = ({ initialRecord, onSaved, hid
 
       const imgData = canvas.toDataURL('image/jpeg', 0.92);
 
-      const pdfWidth = 105; // 105mm standard width
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      if (copies === 1) {
+        // ── Single Copy PDF ─────────────────────────────────────────
+        const pdfWidth = 105; // 105mm standard single receipt width
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: [pdfWidth, pdfHeight],
-        compress: true,
-      });
+        const pdf = new jsPDF({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: [pdfWidth, pdfHeight],
+          compress: true,
+        });
 
-      pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
-      pdf.save(`GatePass-${autoNo}.pdf`);
+        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+        pdf.save(`GatePass-${autoNo}.pdf`);
+      } else {
+        // ── 2 Copies Per Page (Default) ──────────────────────────────
+        const pdf = new jsPDF({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: 'a4', // Standard A4 (210mm x 297mm)
+          compress: true,
+        });
+
+        const pageWidth = 210;
+        const pageHeight = 297;
+
+        let renderWidth = 190;
+        let renderHeight = (canvas.height * renderWidth) / canvas.width;
+
+        // Ensure 2 receipts fit vertically on a single A4 page (max 132mm height per receipt)
+        const maxReceiptHeight = 132;
+        if (renderHeight > maxReceiptHeight) {
+          renderHeight = maxReceiptHeight;
+          renderWidth = (canvas.width * renderHeight) / canvas.height;
+        }
+
+        const xPos = (pageWidth - renderWidth) / 2; // Centered with 10mm margins
+
+        // Top receipt (Copy 1)
+        const y1 = 10;
+        pdf.addImage(imgData, 'JPEG', xPos, y1, renderWidth, renderHeight, undefined, 'FAST');
+
+        // Dashed divider line between receipts
+        const dividerY = y1 + renderHeight + 6;
+        if (dividerY < pageHeight - 20) {
+          pdf.setDrawColor(180, 180, 180);
+          pdf.setLineDashPattern([2, 2], 0);
+          pdf.line(10, dividerY, 200, dividerY);
+        }
+
+        // Bottom receipt (Copy 2 - Identical duplicate)
+        const y2 = dividerY + 6;
+        pdf.addImage(imgData, 'JPEG', xPos, y2, renderWidth, renderHeight, undefined, 'FAST');
+
+        pdf.save(`GatePass-${autoNo}-2copies.pdf`);
+      }
     } catch (err) {
       console.error('Export PDF error:', err);
     } finally {
@@ -623,7 +680,7 @@ const GatePassForm: React.FC<GatePassFormProps> = ({ initialRecord, onSaved, hid
             </button>
             <button
               className={`gp-btn-export ${!saved ? 'disabled' : ''}`}
-              onClick={() => exportPDF(previewRef)}
+              onClick={() => openCopiesModal(previewRef)}
               disabled={!saved || exporting}
             >
               <Download size={16} />
@@ -648,7 +705,7 @@ const GatePassForm: React.FC<GatePassFormProps> = ({ initialRecord, onSaved, hid
               <div className="gp-modal-actions">
                 <button
                   className={`gp-modal-export ${!saved ? 'disabled' : ''}`}
-                  onClick={() => exportPDF(modalPreviewRef)}
+                  onClick={() => openCopiesModal(modalPreviewRef)}
                   disabled={!saved || exporting}
                 >
                   <Download size={15} />
@@ -661,6 +718,97 @@ const GatePassForm: React.FC<GatePassFormProps> = ({ initialRecord, onSaved, hid
             </div>
             <div className="gp-modal-body">
               <GatePassReceipt innerRef={modalPreviewRef} isModal={true} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Copies Selection Dialog Modal ───────────────────────── */}
+      {copiesModalOpen && (
+        <div className="gp-modal-overlay" onClick={() => setCopiesModalOpen(false)}>
+          <div className="gp-copies-modal-box" onClick={e => e.stopPropagation()}>
+            <div className="gp-copies-modal-header">
+              <div className="gp-copies-modal-title">
+                <div className="gp-copies-icon-badge">
+                  <Printer size={20} />
+                </div>
+                <div>
+                  <h3>Export Gate Pass PDF</h3>
+                  <p>Pass #{autoNo} • Select number of copies per page</p>
+                </div>
+              </div>
+              <button className="gp-modal-close" onClick={() => setCopiesModalOpen(false)}>
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="gp-copies-modal-body">
+              <label className="gp-copies-label">Copies Per Page:</label>
+
+              <div className="gp-copies-options">
+                {/* 2 Copies Option (Default) */}
+                <div
+                  className={`gp-copies-card ${copiesCount === 2 ? 'selected' : ''}`}
+                  onClick={() => setCopiesCount(2)}
+                >
+                  <div className="gp-copies-radio">
+                    <div className="gp-radio-inner" />
+                  </div>
+                  <div className="gp-copies-card-info">
+                    <div className="gp-copies-card-top">
+                      <span className="gp-copies-card-title">2 Copies Per Page</span>
+                      <span className="gp-copies-badge default-badge">Default</span>
+                    </div>
+                    <span className="gp-copies-card-desc">
+                      Generates 2 identical stacked receipts on 1 A4 page.
+                    </span>
+                  </div>
+                  <div className="gp-copies-preview-icon">
+                    <div className="gp-preview-mini-sheet">
+                      <div className="gp-preview-mini-rcp" />
+                      <div className="gp-preview-mini-line" />
+                      <div className="gp-preview-mini-rcp" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 1 Copy Option */}
+                <div
+                  className={`gp-copies-card ${copiesCount === 1 ? 'selected' : ''}`}
+                  onClick={() => setCopiesCount(1)}
+                >
+                  <div className="gp-copies-radio">
+                    <div className="gp-radio-inner" />
+                  </div>
+                  <div className="gp-copies-card-info">
+                    <div className="gp-copies-card-top">
+                      <span className="gp-copies-card-title">1 Copy Per Page</span>
+                    </div>
+                    <span className="gp-copies-card-desc">
+                      Generates a single receipt on 1 page.
+                    </span>
+                  </div>
+                  <div className="gp-copies-preview-icon">
+                    <div className="gp-preview-mini-sheet">
+                      <div className="gp-preview-mini-rcp single-rcp" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="gp-copies-modal-footer">
+              <button className="gp-copies-btn-cancel" onClick={() => setCopiesModalOpen(false)}>
+                Cancel
+              </button>
+              <button
+                className="gp-copies-btn-download"
+                onClick={() => executeExportPDF(targetExportRef, copiesCount)}
+                disabled={exporting}
+              >
+                <Download size={16} />
+                <span>{exporting ? 'Generating PDF...' : `Download PDF (${copiesCount} ${copiesCount === 1 ? 'Copy' : 'Copies'})`}</span>
+              </button>
             </div>
           </div>
         </div>
