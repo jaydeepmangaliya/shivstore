@@ -407,16 +407,7 @@ export const PartyOverview: React.FC = () => {
       {/* ── Sidebar ─────────────────────────────────────────────────── */}
       <aside className="sidebar">
         <div className="sidebar-brand">
-          <div className="logo-icon">
-            <svg width="28" height="28" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M32 14C32 10.6863 29.3137 8 26 8H18C13.5817 8 10 11.5817 10 16C10 20.4183 13.5817 24 18 24H30C34.4183 24 38 27.5817 38 32C38 36.4183 34.4183 40 30 40H22C18.6863 40 16 37.3137 16 34"
-                stroke="#ffffff"
-                strokeWidth="7"
-                strokeLinecap="round"
-              />
-            </svg>
-          </div>
+          <div className="logo-icon">S</div>
           <span className="brand-name">SHIV STONE</span>
         </div>
 
