@@ -944,8 +944,8 @@ export const PartyOverview: React.FC = () => {
                           })
                         )}
 
-                        {/* Fill empty rows up to 53 rows to match official physical printed challan sheet */}
-                        {Array.from({ length: Math.max(0, 53 - billRecords.length) }).map((_, i) => (
+                        {/* Fill empty rows up to 40 rows to fit onto a single printed challan page */}
+                        {Array.from({ length: Math.max(0, 40 - billRecords.length) }).map((_, i) => (
                           <tr key={`empty-${i}`} className="po-challan-empty-row">
                             <td className="cell-center">{billRecords.length + i + 1}</td>
                             <td></td>
