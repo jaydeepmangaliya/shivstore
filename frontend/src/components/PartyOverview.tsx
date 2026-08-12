@@ -16,6 +16,8 @@ import {
   Calendar,
   Download,
   Receipt,
+  Printer,
+  FileSpreadsheet,
   X,
 } from 'lucide-react';
 import { fetchGatePasses, deleteGatePass, deleteGatePassesByParty } from '../services/api';
@@ -62,6 +64,7 @@ export const PartyOverview: React.FC = () => {
 
   // Party Statement / Bill Modal State
   const [isBillModalOpen, setIsBillModalOpen] = useState(false);
+  const [statementViewMode, setStatementViewMode] = useState<'challan' | 'summary'>('challan');
   const [billPreset, setBillPreset] = useState<'Current Month' | 'Last 3 Days' | 'Last 7 Days' | 'All Time' | 'Custom'>('Current Month');
   const [billStartDate, setBillStartDate] = useState('');
   const [billEndDate, setBillEndDate] = useState('');
@@ -301,35 +304,96 @@ export const PartyOverview: React.FC = () => {
     }));
   }, [billRecords]);
 
-  // Optimized PDF export: forces 800px A4 desktop layout during capture on any screen (mobile/desktop)
+  // Distinct materials extracted from filtered records (or defaults if none)
+  const statementMaterials = React.useMemo(() => {
+    const set = new Set<string>();
+    billRecords.forEach(r => {
+      if (r.materials && r.materials.trim()) {
+        set.add(r.materials.trim().toUpperCase());
+      }
+    });
+    const list = Array.from(set);
+    if (list.length === 0) {
+      return ['10 MM', '20 MM', 'POWDER'];
+    }
+    const order = ['10 MM', '20 MM', 'POWDER', 'DUST', '6 MM', '40 MM', 'GSB', 'WMM', 'RUBBLE'];
+    list.sort((a, b) => {
+      const ia = order.indexOf(a);
+      const ib = order.indexOf(b);
+      if (ia !== -1 && ib !== -1) return ia - ib;
+      if (ia !== -1) return -1;
+      if (ib !== -1) return 1;
+      return a.localeCompare(b);
+    });
+    return list;
+  }, [billRecords]);
+
+  // Column totals per material
+  const materialColumnTotals = React.useMemo(() => {
+    const totals: Record<string, number> = {};
+    statementMaterials.forEach(m => {
+      totals[m] = 0;
+    });
+    billRecords.forEach(r => {
+      const mat = (r.materials || '').trim().toUpperCase();
+      if (totals[mat] !== undefined) {
+        totals[mat] += r.netWeight;
+      }
+    });
+    return totals;
+  }, [billRecords, statementMaterials]);
+
+  // Direct print handler
+  const handlePrintStatement = () => {
+    window.print();
+  };
+
+  // Optimized PDF export: captures crisp high-res A4 document matching the physical challan ledger
   const handleExportBillPDF = async () => {
     if (!billPrintRef.current) return;
     setIsExportingBill(true);
     const element = billPrintRef.current;
     try {
-      // Add class to enforce fixed 800px A4 print styling during html2canvas capture
       element.classList.add('rendering-pdf');
 
       const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
         backgroundColor: '#ffffff',
-        windowWidth: 1200, // Forces html2canvas to render desktop media query layout
+        windowWidth: 1000,
         logging: false,
       });
 
       element.classList.remove('rendering-pdf');
 
-      const imgData = canvas.toDataURL('image/jpeg', 0.92);
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
         format: 'a4',
-        compress: true
+        compress: true,
       });
+
       const pdfWidth = pdf.internal.pageSize.getWidth(); // 210mm
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+      const pdfHeight = pdf.internal.pageSize.getHeight(); // 297mm
+      const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+
+      if (imgHeight <= pdfHeight) {
+        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, imgHeight, undefined, 'FAST');
+      } else {
+        let heightLeft = imgHeight;
+        let position = 0;
+        pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeight, undefined, 'FAST');
+        heightLeft -= pdfHeight;
+
+        while (heightLeft > 0) {
+          position = heightLeft - imgHeight;
+          pdf.addPage();
+          pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeight, undefined, 'FAST');
+          heightLeft -= pdfHeight;
+        }
+      }
+
       pdf.save(`Statement_${decodedName.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.pdf`);
     } catch (err) {
       console.error('Error generating statement PDF:', err);
@@ -548,23 +612,46 @@ export const PartyOverview: React.FC = () => {
                   <p className="po-chart-sub">{filteredTableRecords.length} records displayed for {decodedName}</p>
                 </div>
 
-                {/* Table Date Range Filter (Single Button Popover) */}
-                <div className="date-filter-wrapper po-table-filter">
-                  <SingleRangeDatePicker
-                    startDate={tableStartDate}
-                    endDate={tableEndDate}
-                    onApply={(start, end) => {
-                      setTableStartDate(start);
-                      setTableEndDate(end);
-                      setCurrentPage(1);
+                {/* Table Actions Row: Date Range Filter + Statement Button */}
+                <div className="po-table-actions-row">
+                  <div className="date-filter-wrapper po-table-filter">
+                    <SingleRangeDatePicker
+                      startDate={tableStartDate}
+                      endDate={tableEndDate}
+                      onApply={(start, end) => {
+                        setTableStartDate(start);
+                        setTableEndDate(end);
+                        setCurrentPage(1);
+                      }}
+                      onReset={() => {
+                        setTableStartDate('');
+                        setTableEndDate('');
+                        setCurrentPage(1);
+                      }}
+                      buttonLabel="Filter by Date"
+                    />
+                  </div>
+
+                  <button
+                    type="button"
+                    className="po-table-statement-btn"
+                    onClick={() => {
+                      if (tableStartDate || tableEndDate) {
+                        setBillPreset('Custom');
+                        setBillStartDate(tableStartDate);
+                        setBillEndDate(tableEndDate);
+                      } else {
+                        setBillPreset('All Time');
+                        setBillStartDate('');
+                        setBillEndDate('');
+                      }
+                      setIsBillModalOpen(true);
                     }}
-                    onReset={() => {
-                      setTableStartDate('');
-                      setTableEndDate('');
-                      setCurrentPage(1);
-                    }}
-                    buttonLabel="Filter by Date"
-                  />
+                    title="Generate official Statement matching physical ledger challan sheet"
+                  >
+                    <FileSpreadsheet size={15} />
+                    <span>Statement</span>
+                  </button>
                 </div>
               </div>
 
@@ -710,14 +797,34 @@ export const PartyOverview: React.FC = () => {
             {/* Modal Header */}
             <div className="po-bill-modal-header">
               <div className="po-bill-modal-title-group">
-                <Receipt size={22} style={{ color: '#5c60f5' }} />
+                <FileSpreadsheet size={22} style={{ color: '#5c60f5' }} />
                 <div>
-                  <h2 className="po-bill-modal-title">Party Statement / Bill Generator</h2>
-                  <p className="po-bill-modal-sub">Generate customized dispatch statement for {decodedName}</p>
+                  <h2 className="po-bill-modal-title">Party Statement / Challan Summary</h2>
+                  <p className="po-bill-modal-sub">Official statement for {decodedName}</p>
                 </div>
               </div>
               <button className="users-modal-close" onClick={() => setIsBillModalOpen(false)} aria-label="Close">
                 <X size={18} />
+              </button>
+            </div>
+
+            {/* View Mode Toggle Tabs */}
+            <div className="po-statement-tabs-bar">
+              <button
+                type="button"
+                className={`po-statement-tab-btn ${statementViewMode === 'challan' ? 'active' : ''}`}
+                onClick={() => setStatementViewMode('challan')}
+              >
+                <FileSpreadsheet size={15} />
+                <span>Challan Ledger Statement (Official Format)</span>
+              </button>
+              <button
+                type="button"
+                className={`po-statement-tab-btn ${statementViewMode === 'summary' ? 'active' : ''}`}
+                onClick={() => setStatementViewMode('summary')}
+              >
+                <Receipt size={15} />
+                <span>Dispatch Summary View</span>
               </button>
             </div>
 
@@ -778,111 +885,209 @@ export const PartyOverview: React.FC = () => {
 
             {/* Printable Statement / Bill Preview Card */}
             <div className="po-bill-preview-wrapper">
-              <div className="po-bill-card" ref={billPrintRef}>
-                {/* Enterprise Header */}
-                <div className="po-bill-top-header">
-                  <div className="po-bill-brand">
-                    <span className="po-bill-badge">GATE PASS BILLING STATEMENT</span>
-                    <h1 className="po-bill-company">Shiv Stone Crusher</h1>
-                    <p className="po-bill-address">Jampar Road, At. Gunda, Ta. Bhanvad, Dist. - Dev Bhumi Dwarka</p>
-                    <p className="po-bill-contact">Mo. 99798 44133 | Mo. 94274 44133</p>
+              {statementViewMode === 'challan' ? (
+                /* ── Physical Challan Sheet Format (Exact Match to Image 1) ── */
+                <div className="po-challan-sheet" ref={billPrintRef}>
+                  {/* Top Framed Header Box */}
+                  <div className="po-challan-header-box">
+                    <h2 className="po-challan-company-title">SHIV STONE CRUSHER MOTA GUNDA</h2>
+                    <div className="po-challan-contact-row">
+                      <span>MOBILE NUMBER :- 9712944133</span>
+                      <span>MOBILE NUMBER :- 9979844133</span>
+                    </div>
+                    <div className="po-challan-purchaser-row">
+                      <span className="po-challan-purchaser-label">PURCHASER :- </span>
+                      <span className="po-challan-purchaser-val">{decodedName.toUpperCase()}</span>
+                    </div>
                   </div>
-                </div>
 
-                <div className="po-bill-divider" />
-
-                {/* Statement Metadata Grid */}
-                <div className="po-bill-meta-grid">
-                  <div className="po-bill-meta-item">
-                    <span className="po-bill-meta-label">PARTY NAME</span>
-                    <span className="po-bill-meta-val">{decodedName}</span>
-                  </div>
-                  <div className="po-bill-meta-item">
-                    <span className="po-bill-meta-label">VILLAGE / LOCATION</span>
-                    <span className="po-bill-meta-val">{(records[0] as any)?.villageName || '—'}</span>
-                  </div>
-                  <div className="po-bill-meta-item">
-                    <span className="po-bill-meta-label">STATEMENT PERIOD</span>
-                    <span className="po-bill-meta-val" style={{ color: '#5c60f5' }}>
-                      {billPreset === 'Custom'
-                        ? (billStartDate || billEndDate
-                            ? `${billStartDate ? formatDisplayDate(billStartDate) : 'Beginning'} to ${billEndDate ? formatDisplayDate(billEndDate) : 'Today'}`
-                            : 'Custom Range')
-                        : billPreset
-                      }
-                    </span>
-                  </div>
-                  <div className="po-bill-meta-item">
-                    <span className="po-bill-meta-label">GENERATED ON</span>
-                    <span className="po-bill-meta-val">{new Date().toLocaleDateString('en-GB')}</span>
-                  </div>
-                </div>
-
-                {/* Section 1: Material Dispatch Summary Table */}
-                <div className="po-bill-section-block">
-                  <h4 className="po-bill-section-title">MATERIAL DISPATCH SUMMARY</h4>
-                  <div className="po-bill-table-responsive">
-                    <table className="po-bill-table">
+                  {/* Main Challan Table Grid */}
+                  <div className="po-challan-table-wrap">
+                    <table className="po-challan-table">
                       <thead>
                         <tr>
-                          <th>Material Type</th>
-                          <th style={{ textAlign: 'center' }}>Total Dispatches</th>
-                          <th style={{ textAlign: 'right' }}>Cumulative Weight (kg)</th>
-                          <th style={{ textAlign: 'right' }}>Total Net Tons</th>
+                          <th className="th-sir" style={{ width: '48px' }}>SIR NO</th>
+                          <th className="th-date" style={{ width: '92px' }}>DATE</th>
+                          <th className="th-veh" style={{ width: '110px' }}>VEHICLE NO</th>
+                          <th className="th-royalty" style={{ width: '80px' }}>ROYALTY NO</th>
+                          {statementMaterials.map((mat, i) => (
+                            <th key={i} className="th-material">{mat}</th>
+                          ))}
                         </tr>
                       </thead>
                       <tbody>
-                        {materialSummaries.length === 0 ? (
+                        {billRecords.length === 0 ? (
                           <tr>
-                            <td colSpan={4} style={{ textAlign: 'center', padding: '20px', color: '#8b92a6' }}>
-                              No material dispatches found for selected period.
+                            <td colSpan={4 + statementMaterials.length} style={{ textAlign: 'center', padding: '30px', color: '#64748b' }}>
+                              No gate pass records found for the selected date range.
                             </td>
                           </tr>
                         ) : (
-                          materialSummaries.map((ms, i) => (
-                            <tr key={i}>
-                              <td style={{ fontWeight: 700, color: '#1a1e35' }}>{ms.material}</td>
-                              <td style={{ textAlign: 'center', fontWeight: 600 }}>{ms.count} Trips</td>
-                              <td style={{ textAlign: 'right', fontWeight: 600 }}>{ms.weightKg.toLocaleString()} kg</td>
-                              <td style={{ textAlign: 'right', fontWeight: 700, color: '#059669' }}>
-                                {ms.tons.toFixed(2)} Tons
-                              </td>
-                            </tr>
-                          ))
+                          billRecords.map((r, idx) => {
+                            const passDate = r.date ? r.date.replace(/\//g, '-') : '';
+                            const recMat = (r.materials || '').trim().toUpperCase();
+                            return (
+                              <tr key={r.id || r.no || idx} className="po-challan-data-row">
+                                <td className="cell-center">{idx + 1}</td>
+                                <td className="cell-center">{passDate}</td>
+                                <td className="cell-center cell-veh-num">{r.vehicleNumber}</td>
+                                <td className="cell-center">{r.no ? `#${r.no}` : '-'}</td>
+                                {statementMaterials.map((mat, mIdx) => {
+                                  const isMatch = recMat === mat;
+                                  return (
+                                    <td key={mIdx} className="cell-weight">
+                                      {isMatch ? r.netWeight.toLocaleString('en-IN') : ''}
+                                    </td>
+                                  );
+                                })}
+                              </tr>
+                            );
+                          })
                         )}
+
+                        {/* Fill empty rows to maintain uniform ledger format */}
+                        {billRecords.length > 0 && Array.from({ length: Math.max(0, 16 - billRecords.length) }).map((_, i) => (
+                          <tr key={`empty-${i}`} className="po-challan-empty-row">
+                            <td className="cell-center">{billRecords.length + i + 1}</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            {statementMaterials.map((_, mIdx) => (
+                              <td key={mIdx}></td>
+                            ))}
+                          </tr>
+                        ))}
+
+                        {/* Bottom Total Row */}
+                        <tr className="po-challan-total-row">
+                          <td colSpan={4} className="cell-total-label">TOTAL TON :-</td>
+                          {statementMaterials.map((mat, mIdx) => (
+                            <td key={mIdx} className="cell-total-val">
+                              {materialColumnTotals[mat] > 0 ? materialColumnTotals[mat].toLocaleString('en-IN') : ''}
+                            </td>
+                          ))}
+                        </tr>
                       </tbody>
                     </table>
                   </div>
-                </div>
 
-                {/* Statement Summary & Totals */}
-                <div className="po-bill-summary-bar">
-                  <div className="po-bill-sum-item">
-                    <span className="po-bill-sum-label">TOTAL DISPATCHES</span>
-                    <span className="po-bill-sum-val">{billRecords.length} Passes</span>
-                  </div>
-                  <div className="po-bill-sum-item">
-                    <span className="po-bill-sum-label">CUMULATIVE WEIGHT</span>
-                    <span className="po-bill-sum-val">{billTotalWeightKg.toLocaleString()} kg</span>
-                  </div>
-                  <div className="po-bill-sum-item po-bill-sum-item--highlight">
-                    <span className="po-bill-sum-label">TOTAL NET TONS</span>
-                    <span className="po-bill-sum-val">{billTotalTons.toFixed(2)} Tons</span>
+                  {/* Stamp / Signature Area */}
+                  <div className="po-challan-footer-stamp">
+                    <div className="po-stamp-box">
+                      <div className="po-stamp-company">SHIV STONE CRUSHER CO.</div>
+                      <div className="po-stamp-gujarati">ભાવેશ ડી પટેલ</div>
+                      <div className="po-stamp-role">PROPRIETOR</div>
+                    </div>
                   </div>
                 </div>
+              ) : (
+                /* ── Summary View ── */
+                <div className="po-bill-card" ref={billPrintRef}>
+                  {/* Enterprise Header */}
+                  <div className="po-bill-top-header">
+                    <div className="po-bill-brand">
+                      <span className="po-bill-badge">GATE PASS BILLING STATEMENT</span>
+                      <h1 className="po-bill-company">Shiv Stone Crusher</h1>
+                      <p className="po-bill-address">Jampar Road, At. Gunda, Ta. Bhanvad, Dist. - Dev Bhumi Dwarka</p>
+                      <p className="po-bill-contact">Mo. 99798 44133 | Mo. 94274 44133</p>
+                    </div>
+                  </div>
 
-                {/* Signatures */}
-                <div className="po-bill-signatures">
-                  <div className="po-bill-sig-col">
-                    <div className="po-bill-sig-line" />
-                    <span className="po-bill-sig-text">Shiv Stone (Auth Signature)</span>
+                  <div className="po-bill-divider" />
+
+                  {/* Statement Metadata Grid */}
+                  <div className="po-bill-meta-grid">
+                    <div className="po-bill-meta-item">
+                      <span className="po-bill-meta-label">PARTY NAME</span>
+                      <span className="po-bill-meta-val">{decodedName}</span>
+                    </div>
+                    <div className="po-bill-meta-item">
+                      <span className="po-bill-meta-label">VILLAGE / LOCATION</span>
+                      <span className="po-bill-meta-val">{(records[0] as any)?.villageName || '—'}</span>
+                    </div>
+                    <div className="po-bill-meta-item">
+                      <span className="po-bill-meta-label">STATEMENT PERIOD</span>
+                      <span className="po-bill-meta-val" style={{ color: '#5c60f5' }}>
+                        {billPreset === 'Custom'
+                          ? (billStartDate || billEndDate
+                              ? `${billStartDate ? formatDisplayDate(billStartDate) : 'Beginning'} to ${billEndDate ? formatDisplayDate(billEndDate) : 'Today'}`
+                              : 'Custom Range')
+                          : billPreset
+                        }
+                      </span>
+                    </div>
+                    <div className="po-bill-meta-item">
+                      <span className="po-bill-meta-label">GENERATED ON</span>
+                      <span className="po-bill-meta-val">{new Date().toLocaleDateString('en-GB')}</span>
+                    </div>
                   </div>
-                  <div className="po-bill-sig-col">
-                    <div className="po-bill-sig-line" />
-                    <span className="po-bill-sig-text">Party / Receiver Signature</span>
+
+                  {/* Section 1: Material Dispatch Summary Table */}
+                  <div className="po-bill-section-block">
+                    <h4 className="po-bill-section-title">MATERIAL DISPATCH SUMMARY</h4>
+                    <div className="po-bill-table-responsive">
+                      <table className="po-bill-table">
+                        <thead>
+                          <tr>
+                            <th>Material Type</th>
+                            <th style={{ textAlign: 'center' }}>Total Dispatches</th>
+                            <th style={{ textAlign: 'right' }}>Cumulative Weight (kg)</th>
+                            <th style={{ textAlign: 'right' }}>Total Net Tons</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {materialSummaries.length === 0 ? (
+                            <tr>
+                              <td colSpan={4} style={{ textAlign: 'center', padding: '20px', color: '#8b92a6' }}>
+                                No material dispatches found for selected period.
+                              </td>
+                            </tr>
+                          ) : (
+                            materialSummaries.map((ms, i) => (
+                              <tr key={i}>
+                                <td style={{ fontWeight: 700, color: '#1a1e35' }}>{ms.material}</td>
+                                <td style={{ textAlign: 'center', fontWeight: 600 }}>{ms.count} Trips</td>
+                                <td style={{ textAlign: 'right', fontWeight: 600 }}>{ms.weightKg.toLocaleString()} kg</td>
+                                <td style={{ textAlign: 'right', fontWeight: 700, color: '#059669' }}>
+                                  {ms.tons.toFixed(2)} Tons
+                                </td>
+                              </tr>
+                            ))
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {/* Statement Summary & Totals */}
+                  <div className="po-bill-summary-bar">
+                    <div className="po-bill-sum-item">
+                      <span className="po-bill-sum-label">TOTAL DISPATCHES</span>
+                      <span className="po-bill-sum-val">{billRecords.length} Passes</span>
+                    </div>
+                    <div className="po-bill-sum-item">
+                      <span className="po-bill-sum-label">CUMULATIVE WEIGHT</span>
+                      <span className="po-bill-sum-val">{billTotalWeightKg.toLocaleString()} kg</span>
+                    </div>
+                    <div className="po-bill-sum-item po-bill-sum-item--highlight">
+                      <span className="po-bill-sum-label">TOTAL NET TONS</span>
+                      <span className="po-bill-sum-val">{billTotalTons.toFixed(2)} Tons</span>
+                    </div>
+                  </div>
+
+                  {/* Signatures */}
+                  <div className="po-bill-signatures">
+                    <div className="po-bill-sig-col">
+                      <div className="po-bill-sig-line" />
+                      <span className="po-bill-sig-text">Shiv Stone (Auth Signature)</span>
+                    </div>
+                    <div className="po-bill-sig-col">
+                      <div className="po-bill-sig-line" />
+                      <span className="po-bill-sig-text">Party / Receiver Signature</span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Modal Actions */}
@@ -893,7 +1098,16 @@ export const PartyOverview: React.FC = () => {
                 disabled={isExportingBill || billRecords.length === 0}
               >
                 <Download size={16} />
-                <span>{isExportingBill ? 'Exporting PDF…' : 'Export Bill PDF'}</span>
+                <span>{isExportingBill ? 'Exporting PDF…' : 'Export Statement PDF'}</span>
+              </button>
+              <button
+                className="po-bill-btn-print"
+                onClick={handlePrintStatement}
+                disabled={billRecords.length === 0}
+                type="button"
+              >
+                <Printer size={16} />
+                <span>Print</span>
               </button>
               <button className="po-bill-btn-close" onClick={() => setIsBillModalOpen(false)}>
                 Close
