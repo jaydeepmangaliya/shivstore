@@ -304,19 +304,18 @@ export const PartyOverview: React.FC = () => {
     }));
   }, [billRecords]);
 
-  // Distinct materials extracted from filtered records (or defaults if none)
+  // Distinct materials extracted from filtered records (ensuring standard stone crusher columns)
   const statementMaterials = React.useMemo(() => {
+    const defaultCols = ['10 MM', '20 MM', '6 MM', 'POWDER', 'GSB'];
     const set = new Set<string>();
     billRecords.forEach(r => {
       if (r.materials && r.materials.trim()) {
         set.add(r.materials.trim().toUpperCase());
       }
     });
+    defaultCols.forEach(c => set.add(c));
     const list = Array.from(set);
-    if (list.length === 0) {
-      return ['10 MM', '20 MM', 'POWDER'];
-    }
-    const order = ['10 MM', '20 MM', 'POWDER', 'DUST', '6 MM', '40 MM', 'GSB', 'WMM', 'RUBBLE'];
+    const order = ['10 MM', '20 MM', '6 MM', '40 MM', 'POWDER', 'DUST', 'GSB', 'WMM', 'RUBBLE'];
     list.sort((a, b) => {
       const ia = order.indexOf(a);
       const ib = order.indexOf(b);
@@ -945,8 +944,8 @@ export const PartyOverview: React.FC = () => {
                           })
                         )}
 
-                        {/* Fill empty rows to maintain uniform ledger format */}
-                        {billRecords.length > 0 && Array.from({ length: Math.max(0, 16 - billRecords.length) }).map((_, i) => (
+                        {/* Fill empty rows up to 53 rows to match official physical printed challan sheet */}
+                        {Array.from({ length: Math.max(0, 53 - billRecords.length) }).map((_, i) => (
                           <tr key={`empty-${i}`} className="po-challan-empty-row">
                             <td className="cell-center">{billRecords.length + i + 1}</td>
                             <td></td>

@@ -969,15 +969,15 @@
 .po-challan-table th,
 .po-challan-table td {
   border: 1px solid #000000;
-  padding: 4.5px 5px;
-  line-height: 1.25;
+  padding: 3px 4px;
+  line-height: 1.2;
 }
 
 .po-challan-table th {
   background: #ffffff;
-  font-weight: 800;
+  font-weight: 900;
   text-align: center;
-  font-size: 11px;
+  font-size: 10.5px;
   text-transform: uppercase;
   letter-spacing: 0.2px;
   white-space: nowrap;
@@ -985,21 +985,25 @@
 
 .po-challan-table .cell-center {
   text-align: center;
+  font-size: 10px;
 }
 
 .po-challan-table .cell-veh-num {
   font-weight: 700;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.2px;
+  font-size: 10.5px;
 }
 
 .po-challan-table .cell-weight {
   text-align: right;
   font-weight: 700;
-  padding-right: 8px;
+  padding-right: 6px;
+  font-size: 10.5px;
 }
 
 .po-challan-empty-row td {
-  height: 21px;
+  height: 18px;
+  font-size: 9.5px;
 }
 
 .po-challan-total-row td {
@@ -1010,18 +1014,18 @@
 }
 
 .po-challan-total-row .cell-total-label {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 900;
   text-align: left;
-  padding-left: 8px;
-  letter-spacing: 0.5px;
+  padding-left: 6px;
+  letter-spacing: 0.4px;
 }
 
 .po-challan-total-row .cell-total-val {
   text-align: right;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 900;
-  padding-right: 8px;
+  padding-right: 6px;
 }
 
 /* Stamp / Signature Area */
