@@ -318,7 +318,7 @@ export const Dashboard: React.FC = () => {
       <aside className={`sidebar ${isMobileSidebarOpen ? 'mobile-open' : ''}`}>
         <div className="sidebar-brand">
           <div className="logo-icon">S</div>
-          <span className="brand-name">SHIVSTORE</span>
+          <span className="brand-name">SHIV STONE</span>
           <button className="sidebar-close-btn" onClick={() => setIsMobileSidebarOpen(false)} aria-label="Close sidebar">
             &times;
           </button>

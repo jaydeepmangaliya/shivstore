@@ -408,7 +408,7 @@ export const PartyOverview: React.FC = () => {
       <aside className="sidebar">
         <div className="sidebar-brand">
           <div className="logo-icon">S</div>
-          <span className="brand-name">SHIVSTORE</span>
+          <span className="brand-name">SHIV STONE</span>
         </div>
 
         <div className="sidebar-user-card" onClick={handleLogout} title="Click to Logout">

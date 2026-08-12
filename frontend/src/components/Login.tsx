@@ -141,7 +141,7 @@ export const Login: React.FC = () => {
               <circle cx="13" cy="37" r="2.5" fill="#6366f1" />
             </svg>
           </div>
-          <h1 className="auth-brand-title">SHIVSTORE</h1>
+          <h1 className="auth-brand-title">SHIV STONE</h1>
           <p className="auth-brand-tagline">
             Complete management system for gate passes, billing, and business analytics.
           </p>
@@ -227,7 +227,7 @@ export const Login: React.FC = () => {
               Don't have an account?{' '}
               <Link to="/register" className="auth-footer-link">Create one</Link>
             </p> */}
-            <p className="auth-footer-copyright">© 2026 SHIVSTORE. All rights reserved.</p>
+            <p className="auth-footer-copyright">© 2026 SHIV STONE. All rights reserved.</p>
           </div>
         </div>
       </div>

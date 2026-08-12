@@ -117,7 +117,7 @@ export const ForgotPassword: React.FC = () => {
               <circle cx="13" cy="37" r="2.5" fill="#6366f1" />
             </svg>
           </div>
-          <h1 className="auth-brand-title">SHIVSTORE</h1>
+          <h1 className="auth-brand-title">SHIV STONE</h1>
           <p className="auth-brand-tagline">
             Account recovery system.
           </p>
@@ -203,7 +203,7 @@ export const ForgotPassword: React.FC = () => {
                 <span>Back to Sign In</span>
               </Link>
             </p>
-            <p className="auth-footer-copyright">© 2026 SHIVSTORE. All rights reserved.</p>
+            <p className="auth-footer-copyright">© 2026 SHIV STONE. All rights reserved.</p>
           </div>
         </div>
       </div>

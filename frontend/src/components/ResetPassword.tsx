@@ -79,7 +79,7 @@ export const ResetPassword: React.FC = () => {
           <div className="auth-brand-logo">
             <span className="auth-brand-logo-letter">S</span>
           </div>
-          <h1 className="auth-brand-title">SHIVSTORE</h1>
+          <h1 className="auth-brand-title">SHIV STONE</h1>
           <p className="auth-brand-tagline">
             Set your new password to regain access.
           </p>
@@ -213,7 +213,7 @@ export const ResetPassword: React.FC = () => {
                 <span>Back to Sign In</span>
               </Link>
             </p>
-            <p className="auth-footer-copyright">© 2026 SHIVSTORE. All rights reserved.</p>
+            <p className="auth-footer-copyright">© 2026 SHIV STONE. All rights reserved.</p>
           </div>
         </div>
       </div>
