@@ -223,10 +223,10 @@ export const Login: React.FC = () => {
           </form>
 
           <div className="auth-footer">
-            <p className="auth-footer-text">
+            {/* <p className="auth-footer-text">
               Don't have an account?{' '}
               <Link to="/register" className="auth-footer-link">Create one</Link>
-            </p>
+            </p> */}
             <p className="auth-footer-copyright">© 2026 SHIVSTORE. All rights reserved.</p>
           </div>
         </div>
