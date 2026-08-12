@@ -974,7 +974,6 @@ export const PartyOverview: React.FC = () => {
                   <div className="po-challan-footer-stamp">
                     <div className="po-stamp-box">
                       <div className="po-stamp-company">SHIV STONE CRUSHER CO.</div>
-                      <div className="po-stamp-gujarati">ભાવેશ ડી પટેલ</div>
                       <div className="po-stamp-role">PROPRIETOR</div>
                     </div>
                   </div>
