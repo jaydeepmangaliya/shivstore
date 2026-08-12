@@ -29,21 +29,13 @@ export const Forms: React.FC = () => {
       <aside className={`sidebar ${isMobileSidebarOpen ? 'mobile-open' : ''}`}>
         <div className="sidebar-brand">
           <div className="logo-icon">
-            <svg width="22" height="22" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <linearGradient id="sLogoGradSidebarForms" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
-                  <stop offset="0%" stopColor="#ffffff" />
-                  <stop offset="100%" stopColor="#e0e7ff" />
-                </linearGradient>
-              </defs>
+            <svg width="28" height="28" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path
                 d="M32 14C32 10.6863 29.3137 8 26 8H18C13.5817 8 10 11.5817 10 16C10 20.4183 13.5817 24 18 24H30C34.4183 24 38 27.5817 38 32C38 36.4183 34.4183 40 30 40H22C18.6863 40 16 37.3137 16 34"
-                stroke="url(#sLogoGradSidebarForms)"
-                strokeWidth="5.5"
+                stroke="#ffffff"
+                strokeWidth="7"
                 strokeLinecap="round"
               />
-              <circle cx="35" cy="11" r="2.5" fill="#c4b5fd" />
-              <circle cx="13" cy="37" r="2.5" fill="#a5b4fc" />
             </svg>
           </div>
           <span className="brand-name">SHIV STONE</span>
