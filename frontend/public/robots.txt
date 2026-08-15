@@ -1,0 +1,10 @@
+# Allow all search engine crawlers (Google, Bing, Yahoo, DuckDuckGo)
+User-agent: *
+Allow: /
+
+# Exclude internal API endpoints from crawling
+Disallow: /api/
+Disallow: /reset-password
+
+# Sitemap reference
+Sitemap: https://shivstone.org/sitemap.xml

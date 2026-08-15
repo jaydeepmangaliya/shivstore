@@ -9,6 +9,7 @@ import { Forms } from './components/Forms';
 import { Users } from './components/Users';
 import { PartyOverview } from './components/PartyOverview';
 import { VehicleOverview } from './components/VehicleOverview';
+import { SEO } from './components/SEO';
 import { isAuthenticated } from './services/api';
 
 /**
@@ -25,6 +26,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 function App() {
   return (
     <BrowserRouter>
+      <SEO />
       <Routes>
         {/* Public Routes */}
         <Route path="/login" element={<Login />} />
