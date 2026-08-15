@@ -35,3 +35,18 @@ logging:
 jwt:
   secret: ${JWT_SECRET:ShivStoreSecretKeyForJWTAuthenticationMustBeAtLeast256BitsLong2026}
   expiration-ms: 21600000   # 6 hours in milliseconds
+
+# AWS S3 Configuration for Database Backups
+aws:
+  s3:
+    enabled: ${AWS_S3_ENABLED:true}
+    bucket: ${AWS_S3_BUCKET_NAME:}
+    region: ${AWS_REGION:us-east-1}
+    access-key: ${AWS_ACCESS_KEY_ID:}
+    secret-key: ${AWS_SECRET_ACCESS_KEY:}
+    backup-folder: ${AWS_S3_BACKUP_FOLDER:backups}
+
+# Scheduled Backup Configuration (Default: 0 0 0 * * ? -> Every night at 12:00 AM)
+backup:
+  cron: ${BACKUP_CRON_EXPRESSION:0 0 0 * * ?}
+

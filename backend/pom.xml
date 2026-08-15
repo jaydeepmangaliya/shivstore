@@ -89,6 +89,13 @@
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
 
+		<!-- AWS Java SDK v2 S3 -->
+		<dependency>
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>s3</artifactId>
+			<version>2.25.15</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>

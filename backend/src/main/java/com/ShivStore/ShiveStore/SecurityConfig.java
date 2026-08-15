@@ -77,8 +77,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Permit CORS preflight OPTIONS requests for all endpoints
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
-                        // Login + Register + Forgot Password endpoints are public
-                        .requestMatchers("/api/auth/**", "/auth/**").permitAll()
+                        // Login + Register + Forgot Password + Backup endpoints are public
+                        .requestMatchers("/api/auth/**", "/auth/**", "/api/backup/**").permitAll()
                         // All other API endpoints require a valid JWT
                         .anyRequest().authenticated())
 

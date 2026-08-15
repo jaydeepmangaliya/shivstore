@@ -16,6 +16,13 @@ services:
       - JWT_SECRET=${JWT_SECRET:-ShivStoreSecretKeyForJWTAuthenticationMustBeAtLeast256BitsLong2026}
       - GMAIL_USERNAME=${GMAIL_USERNAME:-}
       - GMAIL_APP_PASSWORD=${GMAIL_APP_PASSWORD:-}
+      - AWS_S3_ENABLED=${AWS_S3_ENABLED:-true}
+      - AWS_S3_BUCKET_NAME=${AWS_S3_BUCKET_NAME:-}
+      - AWS_REGION=${AWS_REGION:-us-east-1}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-}
+      - AWS_S3_BACKUP_FOLDER=${AWS_S3_BACKUP_FOLDER:-backups}
+      - BACKUP_CRON_EXPRESSION=${BACKUP_CRON_EXPRESSION:-0 0 0 * * ?}
     networks:
       - shivstore-network
 
