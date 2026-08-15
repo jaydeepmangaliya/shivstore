@@ -7,4 +7,4 @@ Disallow: /api/
 Disallow: /reset-password
 
 # Sitemap reference
-Sitemap: https://shivstone.org/sitemap.xml
+Sitemap: https://shivstonecrusher.org/sitemap.xml
