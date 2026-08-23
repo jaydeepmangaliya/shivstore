@@ -24,6 +24,7 @@ import { fetchGatePasses, deleteGatePass, deleteGatePassesByParty } from '../ser
 import GatePassForm from './GatePassForm';
 import type { GatePassRecord } from './GatePassForm';
 import SingleRangeDatePicker from './SingleRangeDatePicker';
+import Pagination from './Pagination';
 import './PartyOverview.css';
 import './Dashboard.css';
 import './Users.css';
@@ -725,38 +726,14 @@ export const PartyOverview: React.FC = () => {
               )}
 
               {/* ── Pagination Controls ── */}
-              {filteredTableRecords.length > 0 && (
-                <div className="table-pagination-footer">
-                  <span className="pagination-info">
-                    Showing <strong>{startIndex + 1}</strong> to <strong>{Math.min(startIndex + ITEMS_PER_PAGE, filteredTableRecords.length)}</strong> of <strong>{filteredTableRecords.length}</strong> entries
-                  </span>
-                  <div className="pagination-controls">
-                    <button
-                      className="pg-btn"
-                      disabled={currentPage === 1}
-                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                    >
-                      Previous
-                    </button>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                      <button
-                        key={page}
-                        className={`pg-num-btn ${currentPage === page ? 'active' : ''}`}
-                        onClick={() => setCurrentPage(page)}
-                      >
-                        {page}
-                      </button>
-                    ))}
-                    <button
-                      className="pg-btn"
-                      disabled={currentPage === totalPages}
-                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                    >
-                      Next
-                    </button>
-                  </div>
-                </div>
-              )}
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalEntries={filteredTableRecords.length}
+                startIndex={startIndex}
+                itemsPerPage={ITEMS_PER_PAGE}
+                onPageChange={page => setCurrentPage(page)}
+              />
             </div>
           </>
         )}
