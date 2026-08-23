@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import './Pagination.css';
 
 interface PaginationProps {
@@ -58,14 +58,39 @@ export const Pagination: React.FC<PaginationProps> = ({
 
   return (
     <div className="table-pagination-footer">
-      <div className="pagination-info-badge">
-        <span className="pg-status-dot" />
-        <span className="pagination-info">
-          Showing <strong>{start}</strong> to <strong>{end}</strong> of <strong>{totalEntries}</strong> entries
-        </span>
+      {/* ── Left Side: Showing Entries & Page Badge ── */}
+      <div className="pagination-info-wrapper">
+        <div className="pagination-info-badge">
+          <span className="pg-status-dot" />
+          <span className="pagination-info">
+            Showing <strong>{start}–{end}</strong> of <strong>{totalEntries}</strong> records
+          </span>
+        </div>
+
+        {totalPages > 1 && (
+          <div className="pg-page-counter-badge">
+            Page <strong>{currentPage}</strong> of <strong>{totalPages}</strong>
+          </div>
+        )}
       </div>
 
+      {/* ── Right Side: Controls ── */}
       <div className="pagination-controls">
+        {/* First Page Jump (when > 5 pages) */}
+        {totalPages > 5 && (
+          <button
+            type="button"
+            className="pg-btn pg-btn-icon-only"
+            disabled={currentPage === 1}
+            onClick={() => onPageChange(1)}
+            aria-label="First Page"
+            title="Jump to First Page"
+          >
+            <ChevronsLeft size={16} />
+          </button>
+        )}
+
+        {/* Previous Button */}
         <button
           type="button"
           className="pg-btn pg-btn-prev"
@@ -78,6 +103,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           <span className="pg-btn-label">Previous</span>
         </button>
 
+        {/* Page Numbers Group */}
         <div className="pg-numbers-group">
           {pageRange.map((item, index) => {
             if (typeof item === 'string') {
@@ -104,6 +130,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           })}
         </div>
 
+        {/* Next Button */}
         <button
           type="button"
           className="pg-btn pg-btn-next"
@@ -115,6 +142,20 @@ export const Pagination: React.FC<PaginationProps> = ({
           <span className="pg-btn-label">Next</span>
           <ChevronRight size={16} />
         </button>
+
+        {/* Last Page Jump (when > 5 pages) */}
+        {totalPages > 5 && (
+          <button
+            type="button"
+            className="pg-btn pg-btn-icon-only"
+            disabled={currentPage === totalPages}
+            onClick={() => onPageChange(totalPages)}
+            aria-label="Last Page"
+            title="Jump to Last Page"
+          >
+            <ChevronsRight size={16} />
+          </button>
+        )}
       </div>
     </div>
   );
