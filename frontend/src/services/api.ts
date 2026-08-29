@@ -378,3 +378,15 @@ export async function fetchVehicleSummaries(
   if (!res.ok) throw new Error(`Failed to fetch vehicle summaries: ${res.statusText}`);
   return res.json();
 }
+
+/** Triggers database backup and downloads the resulting Excel file as a Blob. */
+export async function triggerManualBackup(): Promise<Blob> {
+  const res = await apiFetch(`${API_BASE}/backup/trigger`, {
+    method: 'POST',
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.error || `Backup failed with status: ${res.status}`);
+  }
+  return res.blob();
+}

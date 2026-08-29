@@ -12,9 +12,11 @@ import {
   TrendingDown,
   LogOut,
   X,
-  Truck
+  Truck,
+  Database,
+  Download
 } from 'lucide-react';
-import { fetchDashboardRevenue, fetchDashboardOrders } from '../services/api';
+import { fetchDashboardRevenue, fetchDashboardOrders, triggerManualBackup } from '../services/api';
 import './Dashboard.css';
 
 export const Dashboard: React.FC = () => {
@@ -24,6 +26,28 @@ export const Dashboard: React.FC = () => {
 
   const userName = localStorage.getItem('user_name') || 'Jaydeep';
   const userRole = localStorage.getItem('user_role') || 'Store Manager';
+  const userEmail = localStorage.getItem('user_email') || '';
+  const [isBackingUp, setIsBackingUp] = useState(false);
+
+  const handleManualBackup = async () => {
+    setIsBackingUp(true);
+    try {
+      const blob = await triggerManualBackup();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const timestamp = new Date().toISOString().slice(0, 19).replace(/T/g, '_').replace(/:/g, '-');
+      a.download = `shivstore_db_backup_${timestamp}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      a.remove();
+    } catch (err: any) {
+      alert(err.message || 'Failed to perform manual backup.');
+    } finally {
+      setIsBackingUp(false);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('isAuthenticated');
@@ -381,6 +405,27 @@ export const Dashboard: React.FC = () => {
             <h1 className="page-title">Dashboard</h1>
             <span className="page-date">{currentDate.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>
           </div>
+          {userEmail.toLowerCase() === 'test@gmail.com' && (
+            <div className="header-actions">
+              <button 
+                className="btn-backup-manual"
+                onClick={handleManualBackup}
+                disabled={isBackingUp}
+              >
+                {isBackingUp ? (
+                  <>
+                    <Database size={16} className="animate-spin" />
+                    <span>Backing Up...</span>
+                  </>
+                ) : (
+                  <>
+                    <Download size={16} />
+                    <span>Manual Backup</span>
+                  </>
+                )}
+              </button>
+            </div>
+          )}
         </header>
 
         {/* ── Dashboard Grid ──────────────────────────────────────────────── */}
