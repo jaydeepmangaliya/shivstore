@@ -15,7 +15,8 @@ import {
   X,
   Truck,
   Database,
-  Download
+  Download,
+  FileSpreadsheet
 } from 'lucide-react';
 import { fetchDashboardRevenue, fetchDashboardOrders, triggerManualBackup } from '../services/api';
 import './Dashboard.css';
@@ -52,7 +53,8 @@ export const Dashboard: React.FC = () => {
 
   // Data Dump / Export Modal States
   const [isBackupModalOpen, setIsBackupModalOpen] = useState(false);
-  const [backupMode, setBackupMode] = useState<'month' | 'custom' | 'all'>('month');
+  const [backupMode, setBackupMode] = useState<'month' | 'custom' | 'all' | 'party'>('month');
+  const [partyPeriodMode, setPartyPeriodMode] = useState<'all' | 'month' | 'custom'>('all');
   const [backupYear, setBackupYear] = useState<number>(currentYear);
   const [backupMonth, setBackupMonth] = useState<number>(currentDate.getMonth());
   const [customBackupStart, setCustomBackupStart] = useState<string>(
@@ -76,6 +78,20 @@ export const Dashboard: React.FC = () => {
       sDate = customBackupStart;
       eDate = customBackupEnd;
       label = `${customBackupStart}_to_${customBackupEnd}`;
+    } else if (backupMode === 'party') {
+      if (partyPeriodMode === 'month') {
+        const firstDay = new Date(backupYear, backupMonth, 1);
+        const lastDay = new Date(backupYear, backupMonth + 1, 0);
+        sDate = formatDateISO(firstDay);
+        eDate = formatDateISO(lastDay);
+        label = `party_statements_${monthLongNames[backupMonth]}_${backupYear}`;
+      } else if (partyPeriodMode === 'custom') {
+        sDate = customBackupStart;
+        eDate = customBackupEnd;
+        label = `party_statements_${customBackupStart}_to_${customBackupEnd}`;
+      } else {
+        label = `party_statements_all_time`;
+      }
     }
 
     try {
@@ -762,6 +778,12 @@ export const Dashboard: React.FC = () => {
                 Custom Range
               </button>
               <button
+                className={`dump-tab-btn ${backupMode === 'party' ? 'active' : ''}`}
+                onClick={() => setBackupMode('party')}
+              >
+                Party Statement
+              </button>
+              <button
                 className={`dump-tab-btn ${backupMode === 'all' ? 'active' : ''}`}
                 onClick={() => setBackupMode('all')}
               >
@@ -833,6 +855,96 @@ export const Dashboard: React.FC = () => {
                 </div>
               )}
 
+              {backupMode === 'party' && (
+                <div className="dump-party-section">
+                  <div className="dump-party-badge">
+                    <FileSpreadsheet size={32} style={{ color: '#5c60f5' }} />
+                  </div>
+                  <h3>Party Challan Ledger Excel Statements</h3>
+                  <p className="dump-info-text">
+                    Exports formatted Challan Ledger statements for all parties including material matrix columns and summary totals into Excel.
+                  </p>
+
+                  <div className="dump-field-group" style={{ marginTop: '16px' }}>
+                    <label className="dump-field-label">Filter Statement Period</label>
+                    <div className="dump-party-period-toggle">
+                      <button
+                        type="button"
+                        className={`dump-year-btn ${partyPeriodMode === 'all' ? 'selected' : ''}`}
+                        onClick={() => setPartyPeriodMode('all')}
+                      >
+                        All Time
+                      </button>
+                      <button
+                        type="button"
+                        className={`dump-year-btn ${partyPeriodMode === 'month' ? 'selected' : ''}`}
+                        onClick={() => setPartyPeriodMode('month')}
+                      >
+                        Month Dump
+                      </button>
+                      <button
+                        type="button"
+                        className={`dump-year-btn ${partyPeriodMode === 'custom' ? 'selected' : ''}`}
+                        onClick={() => setPartyPeriodMode('custom')}
+                      >
+                        Custom Range
+                      </button>
+                    </div>
+                  </div>
+
+                  {partyPeriodMode === 'month' && (
+                    <div className="dump-field-group" style={{ marginTop: '16px' }}>
+                      <div className="dump-year-options" style={{ marginBottom: '12px' }}>
+                        {[currentYear, currentYear - 1].map((yr) => (
+                          <button
+                            key={yr}
+                            className={`dump-year-btn ${backupYear === yr ? 'selected' : ''}`}
+                            onClick={() => setBackupYear(yr)}
+                          >
+                            {yr}
+                          </button>
+                        ))}
+                      </div>
+                      <div className="dump-months-grid">
+                        {monthLongNames.map((mName, idx) => (
+                          <button
+                            key={mName}
+                            className={`dump-month-card ${backupMonth === idx ? 'selected' : ''}`}
+                            onClick={() => setBackupMonth(idx)}
+                          >
+                            <span className="dump-month-code">{mName.slice(0, 3)}</span>
+                            <span className="dump-month-full">{mName}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {partyPeriodMode === 'custom' && (
+                    <div className="dump-date-row" style={{ marginTop: '16px' }}>
+                      <div className="dump-date-field">
+                        <label className="dump-field-label">From Date (Start)</label>
+                        <input
+                          type="date"
+                          className="dump-date-input"
+                          value={customBackupStart}
+                          onChange={(e) => setCustomBackupStart(e.target.value)}
+                        />
+                      </div>
+                      <div className="dump-date-field">
+                        <label className="dump-field-label">To Date (End)</label>
+                        <input
+                          type="date"
+                          className="dump-date-input"
+                          value={customBackupEnd}
+                          onChange={(e) => setCustomBackupEnd(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {backupMode === 'all' && (
                 <div className="dump-all-section">
                   <div className="dump-all-badge">
@@ -871,6 +983,8 @@ export const Dashboard: React.FC = () => {
                         ? `Download ${monthLongNames[backupMonth].slice(0, 3)} ${backupYear} Dump`
                         : backupMode === 'custom'
                         ? 'Download Custom Dump'
+                        : backupMode === 'party'
+                        ? 'Download All Parties Excel Statement'
                         : 'Download Full Dump'}
                     </span>
                   </>

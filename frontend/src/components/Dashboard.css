@@ -2103,3 +2103,43 @@ body {
     justify-content: center;
   }
 }
+
+/* Dump Modal Party Section */
+.dump-party-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 8px 0;
+}
+
+.dump-party-badge {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--primary-light, #f5f6ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.dump-party-section h3 {
+  font-family: var(--font-title);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 6px;
+}
+
+.dump-party-period-toggle {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  width: 100%;
+}
+
+.dump-party-period-toggle .dump-year-btn {
+  flex: 1;
+  padding: 8px 12px;
+}

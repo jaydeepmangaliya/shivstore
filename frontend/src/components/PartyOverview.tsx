@@ -21,7 +21,7 @@ import {
   FileSpreadsheet,
   X,
 } from 'lucide-react';
-import { fetchGatePasses, deleteGatePass, deleteGatePassesByParty } from '../services/api';
+import { fetchGatePasses, deleteGatePass, deleteGatePassesByParty, triggerManualBackup } from '../services/api';
 import GatePassForm from './GatePassForm';
 import type { GatePassRecord } from './GatePassForm';
 import SingleRangeDatePicker from './SingleRangeDatePicker';
@@ -72,6 +72,7 @@ export const PartyOverview: React.FC = () => {
   const [billEndDate, setBillEndDate] = useState('');
   const [showBillCalendar, setShowBillCalendar] = useState(true);
   const [isExportingBill, setIsExportingBill] = useState(false);
+  const [isExportingExcel, setIsExportingExcel] = useState(false);
   const billPrintRef = React.useRef<HTMLDivElement>(null);
 
   // Bulk Delete State
@@ -343,6 +344,27 @@ export const PartyOverview: React.FC = () => {
     });
     return totals;
   }, [billRecords, statementMaterials]);
+
+  const handleExportBillExcel = async () => {
+    setIsExportingExcel(true);
+    try {
+      const blob = await triggerManualBackup(billStartDate || undefined, billEndDate || undefined, decodedName);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const cleanParty = decodedName.replace(/[^a-zA-Z0-9]/g, '_');
+      const timestamp = new Date().toISOString().slice(0, 10);
+      a.download = `statement_${cleanParty}_${timestamp}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      a.remove();
+    } catch (err: any) {
+      alert(err.message || 'Failed to export statement Excel.');
+    } finally {
+      setIsExportingExcel(false);
+    }
+  };
 
   // Direct print handler
   const handlePrintStatement = () => {
@@ -1079,6 +1101,16 @@ export const PartyOverview: React.FC = () => {
               >
                 <Download size={16} />
                 <span>{isExportingBill ? 'Exporting PDF…' : 'Export Statement PDF'}</span>
+              </button>
+              <button
+                className="po-bill-btn-export"
+                style={{ background: '#10b981' }}
+                onClick={handleExportBillExcel}
+                disabled={isExportingExcel || billRecords.length === 0}
+                type="button"
+              >
+                <FileSpreadsheet size={16} />
+                <span>{isExportingExcel ? 'Exporting Excel…' : 'Export Statement Excel'}</span>
               </button>
               <button
                 className="po-bill-btn-print"

@@ -47,7 +47,8 @@ public class AdminBackupController {
     public ResponseEntity<?> triggerBackup(
             Authentication authentication,
             @RequestParam(value = "startDate", required = false) String startDate,
-            @RequestParam(value = "endDate", required = false) String endDate) {
+            @RequestParam(value = "endDate", required = false) String endDate,
+            @RequestParam(value = "partyName", required = false) String partyName) {
         if (authentication == null || !authentication.isAuthenticated()) {
             Map<String, String> err = new HashMap<>();
             err.put("error", "Unauthorized - Authentication required");
@@ -59,7 +60,7 @@ public class AdminBackupController {
 
         // 2. Generate and download Excel file
         try {
-            byte[] excelBytes = generateDatabaseExcel(startDate, endDate);
+            byte[] excelBytes = generateDatabaseExcel(startDate, endDate, partyName);
             String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"));
             String fileName = "shivstore_dump_" + timestamp + ".xlsx";
 
@@ -103,11 +104,14 @@ public class AdminBackupController {
         return ResponseEntity.ok(status);
     }
 
-    private byte[] generateDatabaseExcel(String startDateStr, String endDateStr) throws Exception {
+    private byte[] generateDatabaseExcel(String startDateStr, String endDateStr, String partyNameFilter) throws Exception {
         java.time.LocalDate startLimit = parseFlexibleDate(startDateStr);
         java.time.LocalDate endLimit = parseFlexibleDate(endDateStr);
 
         try (Workbook workbook = new XSSFWorkbook()) {
+            // First, create the formatted Party Statement sheet as the primary sheet
+            createPartyStatementSheet(workbook, startLimit, endLimit, partyNameFilter);
+
             Set<String> collections = mongoTemplate.getCollectionNames();
             for (String colName : collections) {
                 if (colName.startsWith("system.")) {
@@ -210,6 +214,252 @@ public class AdminBackupController {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             workbook.write(bos);
             return bos.toByteArray();
+        }
+    }
+
+    private void createPartyStatementSheet(Workbook workbook, java.time.LocalDate startLimit, java.time.LocalDate endLimit, String partyNameFilter) {
+        Sheet sheet = workbook.createSheet("Party Statement");
+        
+        List<Document> rawPasses = mongoTemplate.findAll(Document.class, "gate_passes");
+        
+        List<Document> passes = rawPasses.stream().filter(doc -> {
+            if (partyNameFilter != null && !partyNameFilter.isBlank()) {
+                Object p = doc.get("partyName");
+                if (p == null || !p.toString().trim().equalsIgnoreCase(partyNameFilter.trim())) {
+                    return false;
+                }
+            }
+            Object dateObj = doc.get("date");
+            if (dateObj == null) dateObj = doc.get("createdAt");
+            if (dateObj == null) dateObj = doc.get("timestamp");
+            if (dateObj != null) {
+                java.time.LocalDate docDate = parseFlexibleDate(dateObj);
+                if (docDate != null) {
+                    if (startLimit != null && docDate.isBefore(startLimit)) return false;
+                    if (endLimit != null && docDate.isAfter(endLimit)) return false;
+                }
+            }
+            return true;
+        }).toList();
+
+        if (passes.isEmpty()) {
+            Row row = sheet.createRow(0);
+            row.createCell(0).setCellValue("No gate pass records found for the selected period.");
+            return;
+        }
+
+        // Group by partyName
+        Map<String, List<Document>> partyMap = new LinkedHashMap<>();
+        for (Document doc : passes) {
+            String pName = doc.getString("partyName");
+            if (pName == null || pName.isBlank()) {
+                pName = "UNKNOWN / OTHERS";
+            }
+            partyMap.computeIfAbsent(pName, k -> new ArrayList<>()).add(doc);
+        }
+
+        List<String> materialsList = List.of("10 MM", "20 MM", "6 MM", "40 MM", "POWDER", "GSB", "DUST", "STONE CHIPS", "OTHERS");
+
+        // Cell Styles
+        Font titleFont = workbook.createFont();
+        titleFont.setBold(true);
+        titleFont.setFontHeightInPoints((short) 14);
+
+        Font boldFont = workbook.createFont();
+        boldFont.setBold(true);
+
+        CellStyle companyHeaderStyle = workbook.createCellStyle();
+        companyHeaderStyle.setFont(titleFont);
+        companyHeaderStyle.setAlignment(HorizontalAlignment.CENTER);
+
+        CellStyle contactHeaderStyle = workbook.createCellStyle();
+        contactHeaderStyle.setFont(boldFont);
+        contactHeaderStyle.setAlignment(HorizontalAlignment.CENTER);
+
+        CellStyle purchaserStyle = workbook.createCellStyle();
+        purchaserStyle.setFont(boldFont);
+
+        CellStyle tableHeaderStyle = workbook.createCellStyle();
+        tableHeaderStyle.setFont(boldFont);
+        tableHeaderStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        tableHeaderStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        tableHeaderStyle.setAlignment(HorizontalAlignment.CENTER);
+        tableHeaderStyle.setBorderTop(BorderStyle.THIN);
+        tableHeaderStyle.setBorderBottom(BorderStyle.THIN);
+        tableHeaderStyle.setBorderLeft(BorderStyle.THIN);
+        tableHeaderStyle.setBorderRight(BorderStyle.THIN);
+
+        CellStyle dataStyle = workbook.createCellStyle();
+        dataStyle.setBorderTop(BorderStyle.THIN);
+        dataStyle.setBorderBottom(BorderStyle.THIN);
+        dataStyle.setBorderLeft(BorderStyle.THIN);
+        dataStyle.setBorderRight(BorderStyle.THIN);
+
+        CellStyle totalRowStyle = workbook.createCellStyle();
+        totalRowStyle.setFont(boldFont);
+        totalRowStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        totalRowStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        totalRowStyle.setBorderTop(BorderStyle.THIN);
+        totalRowStyle.setBorderBottom(BorderStyle.THIN);
+        totalRowStyle.setBorderLeft(BorderStyle.THIN);
+        totalRowStyle.setBorderRight(BorderStyle.THIN);
+
+        int currentRow = 0;
+        int totalCols = 4 + materialsList.size() + 2;
+
+        for (Map.Entry<String, List<Document>> entry : partyMap.entrySet()) {
+            String partyName = entry.getKey();
+            List<Document> partyPasses = entry.getValue();
+
+            // Header Row 1: Company Title
+            Row rTitle = sheet.createRow(currentRow++);
+            Cell cTitle = rTitle.createCell(0);
+            cTitle.setCellValue("SHIV STONE CRUSHER MOTA GUNDA");
+            cTitle.setCellStyle(companyHeaderStyle);
+
+            // Header Row 2: Mobile Numbers
+            Row rContact = sheet.createRow(currentRow++);
+            Cell cContact = rContact.createCell(0);
+            cContact.setCellValue("MOBILE NUMBER :- 9712944133           MOBILE NUMBER :- 9979844133");
+            cContact.setCellStyle(contactHeaderStyle);
+
+            // Header Row 3: Purchaser Name
+            Row rPurchaser = sheet.createRow(currentRow++);
+            Cell cPurchaser = rPurchaser.createCell(0);
+            cPurchaser.setCellValue("PURCHASER :- " + partyName.toUpperCase());
+            cPurchaser.setCellStyle(purchaserStyle);
+
+            // Header Row 4: Table Headers
+            Row rHeader = sheet.createRow(currentRow++);
+            String[] baseHeaders = new String[]{"SIR NO", "DATE", "VEHICLE NO", "ROYALTY NO"};
+            for (int i = 0; i < baseHeaders.length; i++) {
+                Cell cell = rHeader.createCell(i);
+                cell.setCellValue(baseHeaders[i]);
+                cell.setCellStyle(tableHeaderStyle);
+            }
+            for (int i = 0; i < materialsList.size(); i++) {
+                Cell cell = rHeader.createCell(4 + i);
+                cell.setCellValue(materialsList.get(i));
+                cell.setCellStyle(tableHeaderStyle);
+            }
+            Cell cNetWt = rHeader.createCell(4 + materialsList.size());
+            cNetWt.setCellValue("NET WEIGHT (KG)");
+            cNetWt.setCellStyle(tableHeaderStyle);
+
+            Cell cNetTons = rHeader.createCell(5 + materialsList.size());
+            cNetTons.setCellValue("NET TONS");
+            cNetTons.setCellStyle(tableHeaderStyle);
+
+            // Data Rows
+            double[] materialTotals = new double[materialsList.size()];
+            double grandNetWeightKg = 0.0;
+            double grandNetTons = 0.0;
+            int sirNo = 1;
+
+            for (Document passDoc : partyPasses) {
+                Row rData = sheet.createRow(currentRow++);
+                
+                // SIR NO
+                Cell cellSir = rData.createCell(0);
+                cellSir.setCellValue(sirNo++);
+                cellSir.setCellStyle(dataStyle);
+
+                // DATE
+                Cell cellDate = rData.createCell(1);
+                Object d = passDoc.get("date");
+                cellDate.setCellValue(d != null ? d.toString() : "");
+                cellDate.setCellStyle(dataStyle);
+
+                // VEHICLE NO
+                Cell cellVeh = rData.createCell(2);
+                Object v = passDoc.get("vehicleNumber");
+                cellVeh.setCellValue(v != null ? v.toString() : "");
+                cellVeh.setCellStyle(dataStyle);
+
+                // ROYALTY NO
+                Cell cellRoyalty = rData.createCell(3);
+                Object passNoObj = passDoc.get("passNo");
+                cellRoyalty.setCellValue(passNoObj != null ? "#" + passNoObj.toString() : "");
+                cellRoyalty.setCellStyle(dataStyle);
+
+                // Material Matching
+                String passMat = passDoc.getString("materials");
+                String passMatNorm = passMat != null ? passMat.trim().toUpperCase() : "";
+
+                Double netWeightVal = passDoc.getDouble("netWeight");
+                if (netWeightVal == null && passDoc.get("netWeight") instanceof Number num) {
+                    netWeightVal = num.doubleValue();
+                }
+                double netWeight = netWeightVal != null ? netWeightVal : 0.0;
+
+                Double netTonsVal = passDoc.getDouble("netTons");
+                if (netTonsVal == null && passDoc.get("netTons") instanceof Number num) {
+                    netTonsVal = num.doubleValue();
+                }
+                double netTons = netTonsVal != null ? netTonsVal : 0.0;
+
+                for (int m = 0; m < materialsList.size(); m++) {
+                    Cell cellMat = rData.createCell(4 + m);
+                    cellMat.setCellStyle(dataStyle);
+
+                    String targetMat = materialsList.get(m);
+                    boolean isMatch = passMatNorm.equalsIgnoreCase(targetMat) || 
+                                     ("OTHERS".equals(targetMat) && materialsList.stream().noneMatch(passMatNorm::equalsIgnoreCase));
+
+                    if (isMatch) {
+                        cellMat.setCellValue(netWeight);
+                        materialTotals[m] += netWeight;
+                    } else {
+                        cellMat.setCellValue("");
+                    }
+                }
+
+                // NET WEIGHT & NET TONS
+                Cell cellNetWeight = rData.createCell(4 + materialsList.size());
+                cellNetWeight.setCellValue(netWeight);
+                cellNetWeight.setCellStyle(dataStyle);
+                grandNetWeightKg += netWeight;
+
+                Cell cellNetTons = rData.createCell(5 + materialsList.size());
+                cellNetTons.setCellValue(netTons);
+                cellNetTons.setCellStyle(dataStyle);
+                grandNetTons += netTons;
+            }
+
+            // Total Summary Row
+            Row rTotal = sheet.createRow(currentRow++);
+            Cell cTotLabel = rTotal.createCell(0);
+            cTotLabel.setCellValue("TOTAL TON / WEIGHT :-");
+            cTotLabel.setCellStyle(totalRowStyle);
+
+            for (int i = 1; i < 4; i++) {
+                Cell cellEmpty = rTotal.createCell(i);
+                cellEmpty.setCellStyle(totalRowStyle);
+            }
+
+            for (int m = 0; m < materialsList.size(); m++) {
+                Cell cellMatTot = rTotal.createCell(4 + m);
+                cellMatTot.setCellValue(materialTotals[m] > 0 ? materialTotals[m] : 0.0);
+                cellMatTot.setCellStyle(totalRowStyle);
+            }
+
+            Cell cTotNetWeight = rTotal.createCell(4 + materialsList.size());
+            cTotNetWeight.setCellValue(grandNetWeightKg);
+            cTotNetWeight.setCellStyle(totalRowStyle);
+
+            Cell cTotNetTons = rTotal.createCell(5 + materialsList.size());
+            cTotNetTons.setCellValue(grandNetTons);
+            cTotNetTons.setCellStyle(totalRowStyle);
+
+            // Add 2 spacing blank rows before next party
+            currentRow += 2;
+        }
+
+        // Auto-size columns
+        for (int col = 0; col < totalCols; col++) {
+            try {
+                sheet.autoSizeColumn(col);
+            } catch (Exception ignored) {}
         }
     }
 
