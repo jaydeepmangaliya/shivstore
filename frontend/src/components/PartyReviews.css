@@ -1,0 +1,20 @@
+/* Party Reviews Custom CSS */
+
+.pr-header {
+  margin-bottom: 24px;
+}
+
+.btn-overview-pass {
+  background: #ede9fe !important;
+  color: #6d28d9 !important;
+  border: 1px solid #ddd6fe !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-overview-pass:hover {
+  background: #7c3aed !important;
+  color: #ffffff !important;
+  border-color: #7c3aed !important;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);
+}

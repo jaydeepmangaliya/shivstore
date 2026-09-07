@@ -5,6 +5,7 @@ import html2canvas from 'html2canvas';
 import {
   LayoutDashboard,
   User,
+  Users as UsersIcon,
   FileText,
   ArrowLeft,
   LogOut,
@@ -434,6 +435,10 @@ export const PartyOverview: React.FC = () => {
               <li className="menu-item" onClick={() => navigate('/users')}>
                 <User size={20} />
                 <span>Users</span>
+              </li>
+              <li className="menu-item" onClick={() => navigate('/parties')}>
+                <UsersIcon size={20} />
+                <span>Party Reviews</span>
               </li>
               <li className="menu-item" onClick={() => navigate('/vehicles')}>
                 <Truck size={20} />

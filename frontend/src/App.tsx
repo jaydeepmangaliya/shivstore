@@ -8,6 +8,7 @@ import { Dashboard } from './components/Dashboard';
 import { Forms } from './components/Forms';
 import { Users } from './components/Users';
 import { PartyOverview } from './components/PartyOverview';
+import { PartyReviews } from './components/PartyReviews';
 import { VehicleOverview } from './components/VehicleOverview';
 import { SEO } from './components/SEO';
 import { isAuthenticated } from './services/api';
@@ -48,6 +49,22 @@ function App() {
           element={
             <ProtectedRoute>
               <Users />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/parties"
+          element={
+            <ProtectedRoute>
+              <PartyReviews />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/party-reviews"
+          element={
+            <ProtectedRoute>
+              <PartyReviews />
             </ProtectedRoute>
           }
         />

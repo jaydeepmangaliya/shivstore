@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
   User,
+  Users as UsersIcon,
   FileText,
   Truck,
   Search,
@@ -145,6 +146,10 @@ export const VehicleOverview: React.FC = () => {
               <li className="menu-item" onClick={() => navigate('/users')}>
                 <User size={20} />
                 <span>Users</span>
+              </li>
+              <li className="menu-item" onClick={() => navigate('/parties')}>
+                <UsersIcon size={20} />
+                <span>Party Reviews</span>
               </li>
               <li className="menu-item active">
                 <Truck size={20} />
