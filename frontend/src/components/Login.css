@@ -118,54 +118,16 @@
   box-sizing: border-box;
 }
 
-/* ── Animated Light Border Card Wrapper ─────────────────────────────────── */
+/* ── Card Wrapper ───────────────────────────────────────────────────────── */
 .auth-card-wrapper {
   position: relative;
   width: 100%;
   max-width: 450px;
-  padding: 1.5px; /* Size of the glow border line */
-  border-radius: 24px;
-  overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
   box-sizing: border-box;
-  isolation: isolate;
-  -webkit-mask-image: -webkit-radial-gradient(white, black);
-  box-shadow: 
-    0 0 25px rgba(92, 96, 245, 0.25),
-    0 20px 60px rgba(0, 0, 0, 0.5);
   animation: authCardAppear 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-/* Continuous running light gradient loop along the outer card border */
-.auth-card-wrapper::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 300%;
-  height: 300%;
-  margin-top: -150%;
-  margin-left: -150%;
-  background: conic-gradient(
-    from 0deg,
-    transparent 65%,
-    var(--auth-primary) 85%,
-    #a5b4fc 93%,
-    var(--auth-secondary) 100%
-  );
-  animation: rotateLightBorder 4s linear infinite;
-  z-index: 1;
-}
-
-@keyframes rotateLightBorder {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
 }
 
 /* ── Glassmorphic Card Content ──────────────────────────────────────────── */
@@ -176,7 +138,11 @@
   background: var(--auth-card-bg);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border-radius: 22.5px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 
+    0 24px 60px rgba(0, 0, 0, 0.45),
+    0 0 35px rgba(92, 96, 245, 0.15);
   padding: 48px 40px;
   overflow: hidden;
   box-sizing: border-box;
