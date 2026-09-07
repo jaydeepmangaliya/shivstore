@@ -1989,3 +1989,117 @@ body {
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+/* ── Mobile Responsive Styles for Data Dump Modal ───────────────────────── */
+
+@media (max-width: 600px) {
+  .dump-modal-overlay {
+    padding: 12px;
+    align-items: center;
+  }
+
+  .dump-modal-box {
+    max-width: 100%;
+    max-height: 92vh;
+    border-radius: 16px;
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.3);
+  }
+
+  .dump-modal-header {
+    padding: 14px 16px;
+  }
+
+  .dump-icon-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+  }
+
+  .dump-modal-title-area h2 {
+    font-size: 15px;
+  }
+
+  .dump-modal-title-area p {
+    font-size: 11px;
+    line-height: 1.3;
+  }
+
+  .dump-modal-tabs {
+    padding: 8px 12px 0 12px;
+    gap: 4px;
+  }
+
+  .dump-tab-btn {
+    font-size: 12px;
+    padding: 8px 4px;
+  }
+
+  .dump-modal-body {
+    padding: 16px 14px;
+    overflow-y: auto;
+  }
+
+  .dump-year-btn {
+    padding: 8px 6px;
+    font-size: 13px;
+  }
+
+  .dump-months-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+
+  .dump-month-card {
+    padding: 8px 4px;
+    border-radius: 8px;
+  }
+
+  .dump-month-code {
+    font-size: 12px;
+  }
+
+  .dump-month-full {
+    font-size: 9px;
+  }
+
+  .dump-date-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .dump-modal-footer {
+    padding: 12px 14px 16px 14px;
+    gap: 8px;
+  }
+
+  .dump-btn-cancel {
+    padding: 10px 14px;
+    font-size: 12.5px;
+    border-radius: 10px;
+  }
+
+  .dump-btn-export {
+    flex: 1;
+    justify-content: center;
+    padding: 10px 14px;
+    font-size: 12.5px;
+    border-radius: 10px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 380px) {
+  .dump-months-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .dump-modal-footer {
+    flex-direction: column-reverse;
+  }
+
+  .dump-btn-cancel,
+  .dump-btn-export {
+    width: 100%;
+    justify-content: center;
+  }
+}

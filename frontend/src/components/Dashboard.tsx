@@ -863,7 +863,7 @@ export const Dashboard: React.FC = () => {
                     <Download size={16} />
                     <span>
                       {backupMode === 'month'
-                        ? `Download ${monthLongNames[backupMonth]} ${backupYear} Dump`
+                        ? `Download ${monthLongNames[backupMonth].slice(0, 3)} ${backupYear} Dump`
                         : backupMode === 'custom'
                         ? 'Download Custom Dump'
                         : 'Download Full Dump'}
