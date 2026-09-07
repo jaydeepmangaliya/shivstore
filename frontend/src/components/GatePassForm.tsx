@@ -4,9 +4,10 @@ import html2canvas from 'html2canvas';
 import { X, Download, Save, CheckCircle2, Printer } from 'lucide-react';
 import { fetchNextPassNo, createGatePass, updateGatePass, fetchGatePasses } from '../services/api';
 import type { GatePassDTO } from '../services/api';
+import logoImg from '../assets/LOGO.png';
 import './GatePass.css';
 
-const MATERIAL_OPTIONS = ['20mm', '40mm', '10mm', 'Dust', 'Grit', 'Stone Chips'];
+const MATERIAL_OPTIONS = ['10mm', '20mm', '40mm', '65mm', '6mm', 'Powder', 'GSB', 'Dust', 'Grit', 'Stone Chips', 'WMM', 'Rubble'];
 
 function getNow() {
   const now = new Date();
@@ -373,14 +374,19 @@ const GatePassForm: React.FC<GatePassFormProps> = ({ initialRecord, onSaved, hid
   const GatePassReceipt = ({ innerRef, isModal = false }: { innerRef: React.RefObject<HTMLDivElement | null>; isModal?: boolean }) => (
     <div className={`gate-pass-receipt ${isModal ? 'modal-receipt' : ''}`} ref={innerRef}>
       {/* Header */}
-      <div className="rcp-header">
+      <div className="rcp-header" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <div className="rcp-top-row">
           <div className="rcp-badge">GATE PASS</div>
           <div className="rcp-phones">Mo. 99798 44133 &nbsp;|&nbsp; Mo. 94274 44133</div>
         </div>
-        <div className="rcp-company-name">Shiv Stone Crusher</div>
-        <div className="rcp-address">
-          Jampar Road, At. Gunda, Ta. Bhanvad, Dist. - Dev Bhumi Dwarka
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginTop: '6px' }}>
+          <img src={logoImg} alt="Shiv Stone Crusher" style={{ height: '42px', width: 'auto', objectFit: 'contain' }} />
+          <div style={{ textAlign: 'left' }}>
+            <div className="rcp-company-name" style={{ margin: 0, fontSize: '18px' }}>Shiv Stone Crusher</div>
+            <div className="rcp-address" style={{ marginTop: '2px', fontSize: '10px' }}>
+              Jampar Road, At. Gunda, Ta. Bhanvad, Dist. - Dev Bhumi Dwarka
+            </div>
+          </div>
         </div>
       </div>
 

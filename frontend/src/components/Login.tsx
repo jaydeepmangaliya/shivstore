@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { login } from '../services/api';
 import { useToast } from './Toast';
+import logoImg from '../assets/LOGO.png';
 import './Login.css';
 
 // ── Swipe-to-Login Component ──────────────────────────────────────────────
@@ -212,7 +213,7 @@ export const Login: React.FC = () => {
             {/* Branding Header */}
             <div className="auth-card-brand">
               <div className="auth-brand-logo">
-                <span className="auth-brand-logo-letter">S</span>
+                <img src={logoImg} alt="Shiv Stone Crusher Logo" style={{ height: '48px', width: 'auto', objectFit: 'contain' }} />
               </div>
               <h1 className="auth-brand-title">SHIV STONE</h1>
               <p className="auth-brand-tagline">Enter your credentials to access your dashboard</p>

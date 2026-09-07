@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Mail, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { forgotPassword } from '../services/api';
 import { useToast } from './Toast';
+import logoImg from '../assets/LOGO.png';
 import './Login.css';
 
 export const ForgotPassword: React.FC = () => {
@@ -53,7 +54,7 @@ export const ForgotPassword: React.FC = () => {
             {/* Logo & Brand Header */}
             <div className="auth-card-brand">
               <div className="auth-brand-logo">
-                <span className="auth-brand-logo-letter">S</span>
+                <img src={logoImg} alt="Shiv Stone Crusher Logo" style={{ height: '48px', width: 'auto', objectFit: 'contain' }} />
               </div>
               <h1 className="auth-brand-title">SHIV STONE</h1>
               <p className="auth-brand-tagline">Enter your email to reset your account password</p>

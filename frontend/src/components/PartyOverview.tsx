@@ -26,6 +26,7 @@ import GatePassForm from './GatePassForm';
 import type { GatePassRecord } from './GatePassForm';
 import SingleRangeDatePicker from './SingleRangeDatePicker';
 import Pagination from './Pagination';
+import logoImg from '../assets/LOGO.png';
 import './PartyOverview.css';
 import './Dashboard.css';
 import './Users.css';
@@ -309,7 +310,7 @@ export const PartyOverview: React.FC = () => {
 
   // Distinct materials extracted from filtered records (ensuring standard stone crusher columns)
   const statementMaterials = React.useMemo(() => {
-    const defaultCols = ['10 MM', '20 MM', '6 MM', 'POWDER', 'GSB'];
+    const defaultCols = ['10 MM', '20 MM', '6 MM', '40 MM', '65 MM', 'POWDER', 'GSB'];
     const set = new Set<string>();
     billRecords.forEach(r => {
       if (r.materials && r.materials.trim()) {
@@ -318,7 +319,7 @@ export const PartyOverview: React.FC = () => {
     });
     defaultCols.forEach(c => set.add(c));
     const list = Array.from(set);
-    const order = ['10 MM', '20 MM', '6 MM', '40 MM', 'POWDER', 'DUST', 'GSB', 'WMM', 'RUBBLE'];
+    const order = ['10 MM', '20 MM', '6 MM', '40 MM', '65 MM', 'POWDER', 'DUST', 'GSB', 'WMM', 'RUBBLE', 'STONE CHIPS'];
     list.sort((a, b) => {
       const ia = order.indexOf(a);
       const ib = order.indexOf(b);
@@ -431,7 +432,7 @@ export const PartyOverview: React.FC = () => {
       {/* ── Sidebar ─────────────────────────────────────────────────── */}
       <aside className="sidebar">
         <div className="sidebar-brand">
-          <div className="logo-icon">S</div>
+          <img src={logoImg} alt="Shiv Stone Crusher Logo" className="app-logo-img" style={{ height: '36px', width: 'auto', objectFit: 'contain' }} />
           <span className="brand-name">SHIV STONE</span>
         </div>
 
@@ -892,15 +893,18 @@ export const PartyOverview: React.FC = () => {
                 /* ── Physical Challan Sheet Format (Exact Match to Image 1) ── */
                 <div className="po-challan-sheet" ref={billPrintRef}>
                   {/* Top Framed Header Box */}
-                  <div className="po-challan-header-box">
-                    <h2 className="po-challan-company-title">SHIV STONE CRUSHER MOTA GUNDA</h2>
-                    <div className="po-challan-contact-row">
-                      <span>MOBILE NUMBER :- 9712944133</span>
-                      <span>MOBILE NUMBER :- 9979844133</span>
-                    </div>
-                    <div className="po-challan-purchaser-row">
-                      <span className="po-challan-purchaser-label">PURCHASER :- </span>
-                      <span className="po-challan-purchaser-val">{decodedName.toUpperCase()}</span>
+                  <div className="po-challan-header-box" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 16px', gap: '16px' }}>
+                    <img src={logoImg} alt="Shiv Stone Crusher Logo" style={{ height: '56px', width: 'auto', objectFit: 'contain' }} />
+                    <div style={{ flex: 1, textAlign: 'center' }}>
+                      <h2 className="po-challan-company-title" style={{ margin: 0, fontSize: '20px' }}>SHIV STONE CRUSHER MOTA GUNDA</h2>
+                      <div className="po-challan-contact-row" style={{ marginTop: '4px' }}>
+                        <span>MOBILE NUMBER :- 9712944133</span>
+                        <span>MOBILE NUMBER :- 9979844133</span>
+                      </div>
+                      <div className="po-challan-purchaser-row" style={{ marginTop: '4px' }}>
+                        <span className="po-challan-purchaser-label">PURCHASER :- </span>
+                        <span className="po-challan-purchaser-val">{decodedName.toUpperCase()}</span>
+                      </div>
                     </div>
                   </div>
 

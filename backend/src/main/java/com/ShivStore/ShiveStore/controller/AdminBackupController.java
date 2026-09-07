@@ -109,12 +109,16 @@ public class AdminBackupController {
         java.time.LocalDate endLimit = parseFlexibleDate(endDateStr);
 
         try (Workbook workbook = new XSSFWorkbook()) {
-            // First, create the formatted Party Statement sheet as the primary sheet
+            // 1. Create the formatted Party Statement sheet as the primary sheet
             createPartyStatementSheet(workbook, startLimit, endLimit, partyNameFilter);
+
+            // 2. Create the distinct Parties summary sheet
+            createPartiesSummarySheet(workbook, startLimit, endLimit);
 
             Set<String> collections = mongoTemplate.getCollectionNames();
             for (String colName : collections) {
-                if (colName.startsWith("system.")) {
+                // Skip system collections and users collection from Excel dump
+                if (colName.startsWith("system.") || "users".equalsIgnoreCase(colName)) {
                     continue;
                 }
 
@@ -258,7 +262,7 @@ public class AdminBackupController {
             partyMap.computeIfAbsent(pName, k -> new ArrayList<>()).add(doc);
         }
 
-        List<String> materialsList = List.of("10 MM", "20 MM", "6 MM", "40 MM", "POWDER", "GSB", "DUST", "STONE CHIPS", "OTHERS");
+        List<String> materialsList = List.of("10 MM", "20 MM", "6 MM", "40 MM", "65 MM", "POWDER", "GSB", "DUST", "STONE CHIPS", "OTHERS");
 
         // Cell Styles
         Font titleFont = workbook.createFont();
@@ -459,6 +463,185 @@ public class AdminBackupController {
         for (int col = 0; col < totalCols; col++) {
             try {
                 sheet.autoSizeColumn(col);
+            } catch (Exception ignored) {}
+        }
+    }
+
+    private void createPartiesSummarySheet(Workbook workbook, java.time.LocalDate startLimit, java.time.LocalDate endLimit) {
+        Sheet sheet = workbook.createSheet("parties");
+
+        List<Document> rawPasses = mongoTemplate.findAll(Document.class, "gate_passes");
+
+        List<Document> passes = rawPasses.stream().filter(doc -> {
+            Object dateObj = doc.get("date");
+            if (dateObj == null) dateObj = doc.get("createdAt");
+            if (dateObj == null) dateObj = doc.get("timestamp");
+            if (dateObj != null) {
+                java.time.LocalDate docDate = parseFlexibleDate(dateObj);
+                if (docDate != null) {
+                    if (startLimit != null && docDate.isBefore(startLimit)) return false;
+                    if (endLimit != null && docDate.isAfter(endLimit)) return false;
+                }
+            }
+            return true;
+        }).toList();
+
+        if (passes.isEmpty()) {
+            Row row = sheet.createRow(0);
+            row.createCell(0).setCellValue("No party dispatches found for the selected period.");
+            return;
+        }
+
+        // Group dispatches by partyName
+        Map<String, List<Document>> partyMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        for (Document doc : passes) {
+            String pName = doc.getString("partyName");
+            if (pName == null || pName.isBlank()) {
+                pName = "UNKNOWN / OTHERS";
+            }
+            partyMap.computeIfAbsent(pName.trim(), k -> new ArrayList<>()).add(doc);
+        }
+
+        // Styles
+        Font boldFont = workbook.createFont();
+        boldFont.setBold(true);
+
+        CellStyle headerStyle = workbook.createCellStyle();
+        headerStyle.setFont(boldFont);
+        headerStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        headerStyle.setAlignment(HorizontalAlignment.CENTER);
+        headerStyle.setBorderTop(BorderStyle.THIN);
+        headerStyle.setBorderBottom(BorderStyle.THIN);
+        headerStyle.setBorderLeft(BorderStyle.THIN);
+        headerStyle.setBorderRight(BorderStyle.THIN);
+
+        CellStyle dataStyle = workbook.createCellStyle();
+        dataStyle.setBorderTop(BorderStyle.THIN);
+        dataStyle.setBorderBottom(BorderStyle.THIN);
+        dataStyle.setBorderLeft(BorderStyle.THIN);
+        dataStyle.setBorderRight(BorderStyle.THIN);
+
+        CellStyle totalStyle = workbook.createCellStyle();
+        totalStyle.setFont(boldFont);
+        totalStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        totalStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        totalStyle.setBorderTop(BorderStyle.THIN);
+        totalStyle.setBorderBottom(BorderStyle.THIN);
+        totalStyle.setBorderLeft(BorderStyle.THIN);
+        totalStyle.setBorderRight(BorderStyle.THIN);
+
+        // Header Row
+        String[] headers = new String[]{
+            "SIR NO", "PARTY NAME", "TOTAL DISPATCHES", "TOTAL NET WEIGHT (KG)", "TOTAL TONS", "FIRST DISPATCH DATE", "LAST DISPATCH DATE"
+        };
+        Row headerRow = sheet.createRow(0);
+        for (int i = 0; i < headers.length; i++) {
+            Cell cell = headerRow.createCell(i);
+            cell.setCellValue(headers[i]);
+            cell.setCellStyle(headerStyle);
+        }
+
+        int rowIdx = 1;
+        int sirNo = 1;
+        int grandDispatches = 0;
+        double grandWeightKg = 0.0;
+        double grandTons = 0.0;
+
+        for (Map.Entry<String, List<Document>> entry : partyMap.entrySet()) {
+            String partyName = entry.getKey();
+            List<Document> partyPasses = entry.getValue();
+
+            int dispatchCount = partyPasses.size();
+            double partyWeightKg = 0.0;
+            double partyTons = 0.0;
+            String firstDate = "";
+            String lastDate = "";
+
+            for (Document pass : partyPasses) {
+                Double nw = pass.getDouble("netWeight");
+                if (nw == null && pass.get("netWeight") instanceof Number num) nw = num.doubleValue();
+                if (nw != null) partyWeightKg += nw;
+
+                Double nt = pass.getDouble("netTons");
+                if (nt == null && pass.get("netTons") instanceof Number num) nt = num.doubleValue();
+                if (nt != null) partyTons += nt;
+
+                Object d = pass.get("date");
+                if (d != null && !d.toString().isBlank()) {
+                    String dStr = d.toString().trim();
+                    if (firstDate.isEmpty()) firstDate = dStr;
+                    lastDate = dStr;
+                }
+            }
+
+            Row row = sheet.createRow(rowIdx++);
+
+            Cell cSir = row.createCell(0);
+            cSir.setCellValue(sirNo++);
+            cSir.setCellStyle(dataStyle);
+
+            Cell cParty = row.createCell(1);
+            cParty.setCellValue(partyName);
+            cParty.setCellStyle(dataStyle);
+
+            Cell cDisp = row.createCell(2);
+            cDisp.setCellValue(dispatchCount);
+            cDisp.setCellStyle(dataStyle);
+
+            Cell cWt = row.createCell(3);
+            cWt.setCellValue(partyWeightKg);
+            cWt.setCellStyle(dataStyle);
+
+            Cell cTons = row.createCell(4);
+            cTons.setCellValue(partyTons);
+            cTons.setCellStyle(dataStyle);
+
+            Cell cFirst = row.createCell(5);
+            cFirst.setCellValue(firstDate);
+            cFirst.setCellStyle(dataStyle);
+
+            Cell cLast = row.createCell(6);
+            cLast.setCellValue(lastDate);
+            cLast.setCellStyle(dataStyle);
+
+            grandDispatches += dispatchCount;
+            grandWeightKg += partyWeightKg;
+            grandTons += partyTons;
+        }
+
+        // Summary Row
+        Row totalRow = sheet.createRow(rowIdx);
+
+        Cell cTotLabel = totalRow.createCell(0);
+        cTotLabel.setCellValue("TOTAL");
+        cTotLabel.setCellStyle(totalStyle);
+
+        Cell cTotParty = totalRow.createCell(1);
+        cTotParty.setCellValue(partyMap.size() + " Unique Parties");
+        cTotParty.setCellStyle(totalStyle);
+
+        Cell cTotDisp = totalRow.createCell(2);
+        cTotDisp.setCellValue(grandDispatches);
+        cTotDisp.setCellStyle(totalStyle);
+
+        Cell cTotWt = totalRow.createCell(3);
+        cTotWt.setCellValue(grandWeightKg);
+        cTotWt.setCellStyle(totalStyle);
+
+        Cell cTotTons = totalRow.createCell(4);
+        cTotTons.setCellValue(grandTons);
+        cTotTons.setCellStyle(totalStyle);
+
+        Cell cEmpty1 = totalRow.createCell(5);
+        cEmpty1.setCellStyle(totalStyle);
+
+        Cell cEmpty2 = totalRow.createCell(6);
+        cEmpty2.setCellStyle(totalStyle);
+
+        for (int i = 0; i < headers.length; i++) {
+            try {
+                sheet.autoSizeColumn(i);
             } catch (Exception ignored) {}
         }
     }

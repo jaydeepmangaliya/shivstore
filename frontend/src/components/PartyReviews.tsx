@@ -19,6 +19,7 @@ import { fetchGatePasses } from '../services/api';
 import type { GatePassDTO } from '../services/api';
 import SingleRangeDatePicker from './SingleRangeDatePicker';
 import Pagination from './Pagination';
+import logoImg from '../assets/LOGO.png';
 import './PartyReviews.css';
 import './Dashboard.css';
 import './Users.css';
@@ -215,7 +216,7 @@ export const PartyReviews: React.FC = () => {
       {/* ── Sidebar Navigation ────────────────────────────────────────────── */}
       <aside className={`sidebar ${isMobileSidebarOpen ? 'mobile-open' : ''}`}>
         <div className="sidebar-brand">
-          <div className="logo-icon">S</div>
+          <img src={logoImg} alt="Shiv Stone Crusher Logo" className="app-logo-img" style={{ height: '36px', width: 'auto', objectFit: 'contain' }} />
           <span className="brand-name">SHIV STONE</span>
           <button className="sidebar-close-btn" onClick={() => setIsMobileSidebarOpen(false)} aria-label="Close sidebar">
             &times;

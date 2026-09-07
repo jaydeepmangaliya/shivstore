@@ -18,6 +18,7 @@ import GatePassForm from './GatePassForm';
 import type { GatePassRecord } from './GatePassForm';
 import SingleRangeDatePicker from './SingleRangeDatePicker';
 import Pagination from './Pagination';
+import logoImg from '../assets/LOGO.png';
 import './Users.css';
 import './Dashboard.css';
 
@@ -157,7 +158,7 @@ export const Users: React.FC = () => {
       {/* ── Sidebar ──────────────────────────────────────────────────────── */}
       <aside className={`sidebar ${isMobileSidebarOpen ? 'mobile-open' : ''}`}>
         <div className="sidebar-brand">
-          <div className="logo-icon">S</div>
+          <img src={logoImg} alt="Shiv Stone Crusher Logo" className="app-logo-img" style={{ height: '36px', width: 'auto', objectFit: 'contain' }} />
           <span className="brand-name">SHIV STONE</span>
           <button className="sidebar-close-btn" onClick={() => setIsMobileSidebarOpen(false)} aria-label="Close sidebar">
             &times;

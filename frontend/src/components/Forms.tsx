@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LayoutDashboard, User, Users as UsersIcon, FileText, LogOut, Truck } from 'lucide-react';
+import logoImg from '../assets/LOGO.png';
 import GatePassForm from './GatePassForm';
 import './Forms.css';
 import './Dashboard.css';
@@ -28,7 +29,7 @@ export const Forms: React.FC = () => {
       {/* Sidebar */}
       <aside className={`sidebar ${isMobileSidebarOpen ? 'mobile-open' : ''}`}>
         <div className="sidebar-brand">
-          <div className="logo-icon">S</div>
+          <img src={logoImg} alt="Shiv Stone Crusher Logo" className="app-logo-img" style={{ height: '36px', width: 'auto', objectFit: 'contain' }} />
           <span className="brand-name">SHIV STONE</span>
           <button className="sidebar-close-btn" onClick={() => setIsMobileSidebarOpen(false)} aria-label="Close sidebar">&times;</button>
         </div>

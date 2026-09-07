@@ -4,6 +4,7 @@ import { Mail, Lock, Eye, EyeOff, User, ArrowRight, CheckCircle } from 'lucide-r
 import { register } from '../services/api';
 import { useToast } from './Toast';
 import { ParticleCanvas } from './ParticleCanvas';
+import logoImg from '../assets/LOGO.png';
 import './Login.css';
 import './Register.css';
 
@@ -156,7 +157,7 @@ export const Register: React.FC = () => {
       <div className="auth-brand-panel">
         <div className="auth-brand-content">
           <div className="auth-brand-logo">
-            <span className="auth-brand-logo-letter">S</span>
+            <img src={logoImg} alt="Shiv Stone Crusher Logo" style={{ height: '48px', width: 'auto', objectFit: 'contain' }} />
           </div>
           <h1 className="auth-brand-title">SHIV STONE</h1>
           <p className="auth-brand-tagline">
