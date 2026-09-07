@@ -25,7 +25,7 @@
 /* ── Full-page Container ────────────────────────────────────────────────── */
 .auth-page {
   min-height: 100vh;
-  width: 100vw;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -118,47 +118,16 @@
   box-sizing: border-box;
 }
 
-/* ── Rotating Border Glow Wrapper ───────────────────────────────────────── */
+/* ── Card Wrapper ───────────────────────────────────────────────────────── */
 .auth-card-wrapper {
   position: relative;
   width: 100%;
   max-width: 450px;
-  padding: 1.5px; /* Size of the glow border line */
-  border-radius: 24px;
-  overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
   box-sizing: border-box;
   animation: authCardAppear 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-/* The rotating conic light beam */
-.auth-card-wrapper::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 350%;
-  height: 350%;
-  transform: translate(-50%, -50%) rotate(0deg);
-  background: conic-gradient(
-    from 0deg,
-    transparent 65%,
-    var(--auth-primary) 85%,
-    var(--auth-secondary) 100%
-  );
-  animation: rotateGlow 5s linear infinite;
-  z-index: 1;
-}
-
-@keyframes rotateGlow {
-  from {
-    transform: translate(-50%, -50%) rotate(0deg);
-  }
-  to {
-    transform: translate(-50%, -50%) rotate(360deg);
-  }
 }
 
 /* ── Glassmorphic Card ──────────────────────────────────────────────────── */
@@ -169,7 +138,11 @@
   background: var(--auth-card-bg);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border-radius: 23px; /* Slightly smaller than wrapper */
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 
+    0 24px 60px rgba(0, 0, 0, 0.45),
+    0 0 40px rgba(92, 96, 245, 0.12);
   padding: 48px 40px;
   overflow: hidden;
   box-sizing: border-box;
@@ -541,12 +514,12 @@
   }
 
   .auth-card-wrapper {
-    border-radius: 20px;
+    width: 100%;
   }
 
   .auth-card {
-    padding: 36px 24px;
-    border-radius: 19px;
+    padding: 32px 20px;
+    border-radius: 20px;
   }
 
   .auth-brand-title {
