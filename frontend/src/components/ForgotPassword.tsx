@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { Mail, ArrowLeft, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { forgotPassword } from '../services/api';
 import { useToast } from './Toast';
 import logoImg from '../assets/LOGO.png';
@@ -48,7 +48,7 @@ export const ForgotPassword: React.FC = () => {
       <div className="blueprint-glow-blob blueprint-glow-blob-2" />
 
       <div className="auth-container">
-        {/* Rotating Border Glow Wrapper */}
+        {/* Animated Light Border Card Wrapper */}
         <div className="auth-card-wrapper">
           <div className="auth-card">
             {/* Logo & Brand Header */}
@@ -103,7 +103,10 @@ export const ForgotPassword: React.FC = () => {
                   {isLoading ? (
                     <span className="auth-spinner">Sending email...</span>
                   ) : (
-                    <span>Send Reset Link</span>
+                    <>
+                      <span>Send Reset Link</span>
+                      <ArrowRight size={16} />
+                    </>
                   )}
                 </button>
               </form>

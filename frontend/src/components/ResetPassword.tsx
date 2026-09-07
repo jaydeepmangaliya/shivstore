@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
-import { Lock, Eye, EyeOff, ArrowLeft, CheckCircle } from 'lucide-react';
+import { Lock, Eye, EyeOff, ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react';
 import { resetPassword } from '../services/api';
 import { useToast } from './Toast';
 import logoImg from '../assets/LOGO.png';
@@ -38,26 +38,26 @@ export const ResetPassword: React.FC = () => {
     e.preventDefault();
 
     if (!token) {
-      toast.error('Invalid Request', 'Reset token is missing from the URL link.');
+      toast.error('Invalid Link', 'Reset token is missing from URL.');
       return;
     }
     if (newPassword.length < 6) {
-      toast.warning('Password Too Short', 'Your password must be at least 6 characters long.');
+      toast.warning('Password Too Short', 'Password must be at least 6 characters.');
       return;
     }
     if (newPassword !== confirmPassword) {
-      toast.error('Passwords Do Not Match', 'Make sure both password fields contain the same value.');
+      toast.error('Passwords Do Not Match', 'Please enter the same password in both fields.');
       return;
     }
 
     setIsLoading(true);
     try {
       const msg = await resetPassword(token, newPassword);
-      toast.success('Password Updated', msg);
-      setTimeout(() => navigate('/login', { replace: true }), 1000);
+      toast.success('Password Updated', `${msg} Redirecting to login...`);
+      setTimeout(() => navigate('/login', { replace: true }), 1200);
     } catch (err: unknown) {
       const raw = err instanceof Error ? err.message : '';
-      toast.error('Reset Failed', raw || 'Invalid or expired token.');
+      toast.error('Reset Failed', raw || 'Failed to update password.');
     } finally {
       setIsLoading(false);
     }
@@ -73,7 +73,7 @@ export const ResetPassword: React.FC = () => {
       <div className="blueprint-glow-blob blueprint-glow-blob-2" />
 
       <div className="auth-container">
-        {/* Rotating Border Glow Wrapper */}
+        {/* Animated Light Border Card Wrapper */}
         <div className="auth-card-wrapper">
           <div className="auth-card">
             {/* Logo & Brand Header */}
@@ -175,7 +175,10 @@ export const ResetPassword: React.FC = () => {
                   {isLoading ? (
                     <span className="auth-spinner">Updating password...</span>
                   ) : (
-                    <span>Set New Password</span>
+                    <>
+                      <span>Set New Password</span>
+                      <ArrowRight size={16} />
+                    </>
                   )}
                 </button>
               </form>
