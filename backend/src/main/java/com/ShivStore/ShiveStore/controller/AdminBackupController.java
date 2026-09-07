@@ -218,7 +218,7 @@ public class AdminBackupController {
     }
 
     private void createPartyStatementSheet(Workbook workbook, java.time.LocalDate startLimit, java.time.LocalDate endLimit, String partyNameFilter) {
-        Sheet sheet = workbook.createSheet("Party Statement");
+        Sheet sheet = workbook.createSheet("party_statement");
         
         List<Document> rawPasses = mongoTemplate.findAll(Document.class, "gate_passes");
         
