@@ -103,7 +103,6 @@ const SwipeButton: React.FC<SwipeButtonProps> = ({ onSuccess, isLoading, text })
   const containerWidth = containerRef.current?.clientWidth || 0;
   const handleWidth = handleRef.current?.clientWidth || 0;
   const maxDrag = containerWidth - handleWidth - 8 || 1;
-  const dragPercentage = Math.min(100, (dragX / maxDrag) * 100);
 
   return (
     <div 
@@ -112,7 +111,7 @@ const SwipeButton: React.FC<SwipeButtonProps> = ({ onSuccess, isLoading, text })
     >
       <div 
         className="swipe-button-fill" 
-        style={{ width: `calc(${dragPercentage}% + 44px)` }}
+        style={{ width: dragX > 0 ? `${dragX + 44}px` : '0px' }}
       />
       <span 
         className="swipe-button-text"
