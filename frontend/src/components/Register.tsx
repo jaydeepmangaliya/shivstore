@@ -106,7 +106,7 @@ export const Register: React.FC = () => {
       <div className="blueprint-glow-blob blueprint-glow-blob-2" />
 
       <div className="auth-container">
-        {/* Animated Light Border Card Wrapper */}
+        {/* Card Wrapper */}
         <div className="auth-card-wrapper">
           <div className="auth-card">
             {/* Logo & Brand Header */}
