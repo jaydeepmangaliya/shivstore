@@ -405,27 +405,25 @@ export const Dashboard: React.FC = () => {
             <h1 className="page-title">Dashboard</h1>
             <span className="page-date">{currentDate.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>
           </div>
-          {userEmail.toLowerCase() === 'test@gmail.com' && (
-            <div className="header-actions">
-              <button 
-                className="btn-backup-manual"
-                onClick={handleManualBackup}
-                disabled={isBackingUp}
-              >
-                {isBackingUp ? (
-                  <>
-                    <Database size={16} className="animate-spin" />
-                    <span>Backing Up...</span>
-                  </>
-                ) : (
-                  <>
-                    <Download size={16} />
-                    <span>Manual Backup</span>
-                  </>
-                )}
-              </button>
-            </div>
-          )}
+          <div className="header-actions">
+            <button 
+              className="btn-backup-manual"
+              onClick={handleManualBackup}
+              disabled={isBackingUp}
+            >
+              {isBackingUp ? (
+                <>
+                  <Database size={16} className="animate-spin" />
+                  <span>Backing Up...</span>
+                </>
+              ) : (
+                <>
+                  <Download size={16} />
+                  <span>Manual Backup</span>
+                </>
+              )}
+            </button>
+          </div>
         </header>
 
         {/* ── Dashboard Grid ──────────────────────────────────────────────── */}

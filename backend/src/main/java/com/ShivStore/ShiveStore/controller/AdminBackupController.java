@@ -39,7 +39,7 @@ public class AdminBackupController {
 
     /**
      * Manually triggers database backup and S3 upload, and returns the backup data as a downloadable Excel (.xlsx) file.
-     * Accessible only by test@gmail.com.
+     * Accessible by all authenticated users.
      * Endpoints: GET/POST /api/backup/trigger or /api/backup/manual
      */
     @RequestMapping(value = {"/trigger", "/manual"}, method = {RequestMethod.GET, RequestMethod.POST})
@@ -48,13 +48,6 @@ public class AdminBackupController {
             Map<String, String> err = new HashMap<>();
             err.put("error", "Unauthorized - Authentication required");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(err);
-        }
-
-        String email = authentication.getName();
-        if (!"test@gmail.com".equalsIgnoreCase(email)) {
-            Map<String, String> err = new HashMap<>();
-            err.put("error", "Forbidden - Only test@gmail.com can trigger manual backups");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(err);
         }
 
         // 1. Perform S3 backup in the background/sync
@@ -89,7 +82,7 @@ public class AdminBackupController {
 
     /**
      * Checks S3 backup configuration status.
-     * Accessible only by test@gmail.com.
+     * Accessible by all authenticated users.
      */
     @GetMapping("/status")
     public ResponseEntity<?> getBackupStatus(Authentication authentication) {
@@ -97,13 +90,6 @@ public class AdminBackupController {
             Map<String, String> err = new HashMap<>();
             err.put("error", "Unauthorized - Authentication required");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(err);
-        }
-
-        String email = authentication.getName();
-        if (!"test@gmail.com".equalsIgnoreCase(email)) {
-            Map<String, String> err = new HashMap<>();
-            err.put("error", "Forbidden - Only test@gmail.com can view backup status");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(err);
         }
 
         Map<String, Object> status = new HashMap<>();

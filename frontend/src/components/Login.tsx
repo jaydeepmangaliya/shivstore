@@ -1,11 +1,142 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { login } from '../services/api';
 import { useToast } from './Toast';
-import { ParticleCanvas } from './ParticleCanvas';
 import './Login.css';
 
+// ── Swipe-to-Login Component ──────────────────────────────────────────────
+interface SwipeButtonProps {
+  onSuccess: () => void;
+  isLoading: boolean;
+  text: string;
+}
+
+const SwipeButton: React.FC<SwipeButtonProps> = ({ onSuccess, isLoading, text }) => {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const handleRef = useRef<HTMLDivElement | null>(null);
+  const [dragX, setDragX] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const startX = useRef(0);
+
+  // Springs back if loading stops (e.g. login completes or fails)
+  useEffect(() => {
+    if (!isLoading && isSuccess) {
+      setIsSuccess(false);
+      setDragX(0);
+    }
+  }, [isLoading]);
+
+  // Visual spring-back fallback: if validation fails instantly, loading is never set.
+  // We automatically reset the handle after 1 second if no loading state starts.
+  useEffect(() => {
+    let timeout: ReturnType<typeof setTimeout>;
+    if (isSuccess && !isLoading) {
+      timeout = setTimeout(() => {
+        setIsSuccess(false);
+        setDragX(0);
+      }, 1000);
+    }
+    return () => clearTimeout(timeout);
+  }, [isSuccess, isLoading]);
+
+  const handleStart = (clientX: number) => {
+    if (isLoading || isSuccess) return;
+    setIsDragging(true);
+    startX.current = clientX - dragX;
+  };
+
+  const handleMove = (clientX: number) => {
+    if (!isDragging || isLoading || isSuccess || !containerRef.current || !handleRef.current) return;
+    
+    const containerWidth = containerRef.current.clientWidth;
+    const handleWidth = handleRef.current.clientWidth;
+    const maxDrag = containerWidth - handleWidth - 8; // 4px padding on each side
+    
+    let currentDrag = clientX - startX.current;
+    if (currentDrag < 0) currentDrag = 0;
+    if (currentDrag > maxDrag) currentDrag = maxDrag;
+    
+    setDragX(currentDrag);
+
+    // Trigger success when dragged past 95% of track
+    if (currentDrag >= maxDrag * 0.95) {
+      setIsDragging(false);
+      setDragX(maxDrag);
+      setIsSuccess(true);
+      onSuccess();
+    }
+  };
+
+  const handleEnd = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    if (!isSuccess) {
+      setDragX(0);
+    }
+  };
+
+  useEffect(() => {
+    const onMouseMove = (e: MouseEvent) => handleMove(e.clientX);
+    const onMouseUp = () => handleEnd();
+    const onTouchMove = (e: TouchEvent) => handleMove(e.touches[0].clientX);
+    const onTouchEnd = () => handleEnd();
+
+    if (isDragging) {
+      window.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('mouseup', onMouseUp);
+      window.addEventListener('touchmove', onTouchMove);
+      window.addEventListener('touchend', onTouchEnd);
+    }
+
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', onTouchEnd);
+    };
+  }, [isDragging]);
+
+  const containerWidth = containerRef.current?.clientWidth || 0;
+  const handleWidth = handleRef.current?.clientWidth || 0;
+  const maxDrag = containerWidth - handleWidth - 8 || 1;
+  const dragPercentage = Math.min(100, (dragX / maxDrag) * 100);
+
+  return (
+    <div 
+      className={`swipe-button-container ${isLoading || isSuccess ? 'loading' : ''} ${isDragging ? 'dragging' : ''}`}
+      ref={containerRef}
+    >
+      <div 
+        className="swipe-button-fill" 
+        style={{ width: `calc(${dragPercentage}% + 44px)` }}
+      />
+      <span 
+        className="swipe-button-text"
+        style={{ opacity: Math.max(0, 1 - (dragX / maxDrag) * 1.5) }}
+      >
+        {isLoading ? 'Signing in...' : text}
+      </span>
+      <div
+        className="swipe-button-handle"
+        ref={handleRef}
+        style={{ transform: `translateX(${dragX}px)` }}
+        onMouseDown={(e) => handleStart(e.clientX)}
+        onTouchStart={(e) => handleStart(e.touches[0].clientX)}
+      >
+        {isLoading ? (
+          <div className="swipe-button-spinner" />
+        ) : (
+          <ArrowRight size={18} />
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ── Login Component ────────────────────────────────────────────────────────
 export const Login: React.FC = () => {
   const navigate = useNavigate();
   const toast = useToast();
@@ -15,10 +146,9 @@ export const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleLogin = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
 
-    // ── Client-side validation with descriptive toasts ────────────────────
     if (!email.trim()) {
       toast.warning('Email Required', 'Please enter your email address to continue.');
       return;
@@ -36,12 +166,9 @@ export const Login: React.FC = () => {
     try {
       const data = await login(email.trim().toLowerCase(), password);
       toast.success('Welcome back!', `Signed in as ${data.name}.`);
-      // Small delay so the user sees the success toast before navigating
       setTimeout(() => navigate('/dashboard', { replace: true }), 600);
     } catch (err: unknown) {
       const raw = err instanceof Error ? err.message : '';
-
-      // Map API messages to clear, user-friendly explanations
       if (raw.toLowerCase().includes('invalid email or password')) {
         toast.error(
           'Sign In Failed',
@@ -62,153 +189,104 @@ export const Login: React.FC = () => {
     }
   };
 
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 });
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const { innerWidth, innerHeight } = window;
-    const x = (e.clientX - innerWidth / 2) / (innerWidth / 2);
-    const y = (e.clientY - innerHeight / 2) / (innerHeight / 2);
-    setMousePos({ x, y });
-    setCursorPos({ x: e.clientX, y: e.clientY });
+  const triggerSubmit = () => {
+    const hiddenSubmit = document.getElementById('login-submit-hidden-btn');
+    if (hiddenSubmit) {
+      hiddenSubmit.click();
+    }
   };
 
   return (
-    <div className="auth-page" onMouseMove={handleMouseMove}>
-      {/* Interactive Background Particle Constellation Canvas */}
-      <ParticleCanvas />
+    <div className="auth-page">
+      {/* Blueprint Geometric Background Circles & Glow Blobs */}
+      <div className="blueprint-circle blueprint-circle-1" />
+      <div className="blueprint-circle blueprint-circle-2" />
+      <div className="blueprint-circle blueprint-circle-3" />
+      <div className="blueprint-glow-blob blueprint-glow-blob-1" />
+      <div className="blueprint-glow-blob blueprint-glow-blob-2" />
 
-      {/* Dynamic Cursor Spotlight Follower */}
-      <div
-        className="auth-mouse-spotlight"
-        style={{
-          left: `${cursorPos.x}px`,
-          top: `${cursorPos.y}px`,
-        }}
-      />
-      <div
-        className="auth-mouse-dot"
-        style={{
-          left: `${cursorPos.x}px`,
-          top: `${cursorPos.y}px`,
-        }}
-      />
-
-      {/* Background Effects */}
-      <div className="auth-bg-gradient" />
-      <div className="auth-grid-overlay" />
-      <div
-        className="auth-orb auth-orb-1"
-        style={{
-          transform: `translate(${mousePos.x * 45}px, ${mousePos.y * 45}px)`,
-        }}
-      />
-      <div
-        className="auth-orb auth-orb-2"
-        style={{
-          transform: `translate(${mousePos.x * -55}px, ${mousePos.y * -55}px)`,
-        }}
-      />
-      <div
-        className="auth-orb auth-orb-3"
-        style={{
-          transform: `translate(${mousePos.x * 35}px, ${mousePos.y * -35}px)`,
-        }}
-      />
-
-      {/* Brand Panel — Left Side */}
-      <div className="auth-brand-panel">
-        <div className="auth-brand-content">
-          <div className="auth-brand-logo">
-            <span className="auth-brand-logo-letter">S</span>
-          </div>
-          <h1 className="auth-brand-title">SHIV STONE</h1>
-          <p className="auth-brand-tagline">
-            Complete management system for gate passes, billing, and business analytics.
-          </p>
-        </div>
-      </div>
-
-      {/* Form Panel — Right Side */}
-      <div className="auth-form-panel">
-        <div className="auth-card">
-          {/* Dynamic Specular Light Shine Reflection */}
-          <div
-            className="auth-card-shine"
-            style={{
-              background: `radial-gradient(circle at ${((mousePos.x + 1) * 50).toFixed(1)}% ${((mousePos.y + 1) * 50).toFixed(1)}%, rgba(255, 255, 255, 0.16) 0%, rgba(99, 102, 241, 0.06) 45%, transparent 70%)`,
-            }}
-          />
-
-          <div className="auth-card-header">
-            <h2 className="auth-card-title">Welcome back</h2>
-            <p className="auth-card-subtitle">Enter your credentials to access your dashboard</p>
-          </div>
-
-          <form className="auth-form" onSubmit={handleLogin}>
-            {/* Email */}
-            <div className="auth-input-group">
-              <label htmlFor="login-email" className="auth-input-label">Email Address</label>
-              <div className="auth-input-wrapper">
-                <Mail size={18} className="auth-input-icon" />
-                <input
-                  id="login-email"
-                  type="email"
-                  className="auth-input"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  autoComplete="email"
-                />
+      <div className="auth-container">
+        {/* Rotating Border Glow Wrapper */}
+        <div className="auth-card-wrapper">
+          <div className="auth-card">
+            {/* Branding Header */}
+            <div className="auth-card-brand">
+              <div className="auth-brand-logo">
+                <span className="auth-brand-logo-letter">S</span>
               </div>
+              <h1 className="auth-brand-title">SHIV STONE</h1>
+              <p className="auth-brand-tagline">Enter your credentials to access your dashboard</p>
             </div>
 
-            {/* Password */}
-            <div className="auth-input-group">
-              <div className="auth-input-label-row">
-                <label htmlFor="login-password" className="auth-input-label">Password</label>
-                <Link to="/forgot-password" className="auth-forgot-link">Forgot password?</Link>
+            <div className="auth-card-divider" />
+
+            {/* Login Form */}
+            <form className="auth-form" onSubmit={handleLogin}>
+              {/* Email */}
+              <div className="auth-input-group">
+                <label htmlFor="login-email" className="auth-input-label">Email Address</label>
+                <div className="auth-input-wrapper">
+                  <Mail size={16} className="auth-input-icon" />
+                  <input
+                    id="login-email"
+                    type="email"
+                    className="auth-input"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    autoComplete="email"
+                  />
+                </div>
               </div>
-              <div className="auth-input-wrapper">
-                <Lock size={18} className="auth-input-icon" />
-                <input
-                  id="login-password"
-                  type={showPassword ? 'text' : 'password'}
-                  className="auth-input"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  autoComplete="current-password"
+
+              {/* Password */}
+              <div className="auth-input-group">
+                <div className="auth-input-label-row">
+                  <label htmlFor="login-password" className="auth-input-label">Password</label>
+                  <Link to="/forgot-password" className="auth-forgot-link">Forgot password?</Link>
+                </div>
+                <div className="auth-input-wrapper">
+                  <Lock size={16} className="auth-input-icon" />
+                  <input
+                    id="login-password"
+                    type={showPassword ? 'text' : 'password'}
+                    className="auth-input"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    autoComplete="current-password"
+                  />
+                  <button
+                    type="button"
+                    className="auth-toggle-pw-btn"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Swipe-to-Login Trigger Button */}
+              <div className="auth-submit-wrapper">
+                <SwipeButton 
+                  onSuccess={triggerSubmit}
+                  isLoading={isLoading}
+                  text="Swipe to Sign In"
                 />
-                <button
-                  type="button"
-                  className="auth-toggle-pw-btn"
-                  onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
               </div>
+
+              {/* Hidden Standard Submit Button for Fallback (Enter Key) */}
+              <button 
+                type="submit" 
+                id="login-submit-hidden-btn" 
+                style={{ display: 'none' }} 
+              />
+            </form>
+
+            <div className="auth-footer">
+              <p className="auth-footer-copyright">© 2026 SHIV STONE. All rights reserved.</p>
             </div>
-
-            <button type="submit" className="auth-submit-btn" disabled={isLoading}>
-              {isLoading ? (
-                <span className="auth-spinner">Signing in...</span>
-              ) : (
-                <>
-                  <span>Sign In to Dashboard</span>
-                  <ArrowRight size={18} />
-                </>
-              )}
-            </button>
-          </form>
-
-          <div className="auth-footer">
-            {/* <p className="auth-footer-text">
-              Don't have an account?{' '}
-              <Link to="/register" className="auth-footer-link">Create one</Link>
-            </p> */}
-            <p className="auth-footer-copyright">© 2026 SHIV STONE. All rights reserved.</p>
           </div>
         </div>
       </div>
