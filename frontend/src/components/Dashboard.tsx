@@ -26,7 +26,6 @@ export const Dashboard: React.FC = () => {
 
   const userName = localStorage.getItem('user_name') || 'Jaydeep';
   const userRole = localStorage.getItem('user_role') || 'Store Manager';
-  const userEmail = localStorage.getItem('user_email') || '';
   const [isBackingUp, setIsBackingUp] = useState(false);
 
   const handleManualBackup = async () => {
