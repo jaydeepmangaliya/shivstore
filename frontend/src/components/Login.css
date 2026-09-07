@@ -456,8 +456,46 @@
   animation: authSpin 0.6s linear infinite;
 }
 
-@keyframes authSpin {
-  to { transform: rotate(360deg); }
+/* ── Auth Submit Button ────────────────────────────────────────────── */
+.auth-submit-btn {
+  width: 100%;
+  height: 48px;
+  background: linear-gradient(135deg, var(--auth-primary), var(--auth-secondary));
+  color: #ffffff !important;
+  border: none;
+  border-radius: 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 16px rgba(92, 96, 245, 0.35);
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  margin-top: 12px;
+  box-sizing: border-box;
+  text-decoration: none;
+}
+
+.auth-submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(92, 96, 245, 0.5);
+  background: linear-gradient(135deg, #6c70f7, #8589ff);
+  color: #ffffff !important;
+}
+
+.auth-submit-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(92, 96, 245, 0.3);
+}
+
+.auth-submit-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 /* ── Footer ─────────────────────────────────────────────────────────────── */
