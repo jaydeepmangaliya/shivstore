@@ -36,7 +36,7 @@ export const Forms: React.FC = () => {
 
         <div className="sidebar-user-card" onClick={handleLogout} title="Click to Logout">
           <div className="sidebar-avatar">
-            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&fit=crop&q=80" alt="User" />
+            <img src={logoImg} alt="Shiv Stone Crusher Logo" />
           </div>
           <div className="sidebar-user-info">
             <span className="sidebar-user-name">{userName}</span>

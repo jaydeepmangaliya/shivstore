@@ -54,7 +54,7 @@ export const ForgotPassword: React.FC = () => {
             {/* Logo & Brand Header */}
             <div className="auth-card-brand">
               <div className="auth-brand-logo">
-                <img src={logoImg} alt="Shiv Stone Crusher Logo" style={{ height: '48px', width: 'auto', objectFit: 'contain' }} />
+                <img src={logoImg} alt="Shiv Stone Crusher Logo" />
               </div>
               <h1 className="auth-brand-title">SHIV STONE</h1>
               <p className="auth-brand-tagline">Enter your email to reset your account password</p>

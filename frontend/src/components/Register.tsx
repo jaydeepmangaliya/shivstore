@@ -157,7 +157,7 @@ export const Register: React.FC = () => {
       <div className="auth-brand-panel">
         <div className="auth-brand-content">
           <div className="auth-brand-logo">
-            <img src={logoImg} alt="Shiv Stone Crusher Logo" style={{ height: '48px', width: 'auto', objectFit: 'contain' }} />
+            <img src={logoImg} alt="Shiv Stone Crusher Logo" />
           </div>
           <h1 className="auth-brand-title">SHIV STONE</h1>
           <p className="auth-brand-tagline">

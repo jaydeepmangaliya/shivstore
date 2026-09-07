@@ -79,7 +79,7 @@ export const ResetPassword: React.FC = () => {
             {/* Logo & Brand Header */}
             <div className="auth-card-brand">
               <div className="auth-brand-logo">
-                <img src={logoImg} alt="Shiv Stone Crusher Logo" style={{ height: '48px', width: 'auto', objectFit: 'contain' }} />
+                <img src={logoImg} alt="Shiv Stone Crusher Logo" />
               </div>
               <h1 className="auth-brand-title">SHIV STONE</h1>
               <p className="auth-brand-tagline">Set your new account password</p>
