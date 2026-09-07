@@ -28,26 +28,6 @@ export const Dashboard: React.FC = () => {
   const userRole = localStorage.getItem('user_role') || 'Store Manager';
   const [isBackingUp, setIsBackingUp] = useState(false);
 
-  const handleManualBackup = async () => {
-    setIsBackingUp(true);
-    try {
-      const blob = await triggerManualBackup();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      const timestamp = new Date().toISOString().slice(0, 19).replace(/T/g, '_').replace(/:/g, '-');
-      a.download = `shivstore_db_backup_${timestamp}.xlsx`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      a.remove();
-    } catch (err: any) {
-      alert(err.message || 'Failed to perform manual backup.');
-    } finally {
-      setIsBackingUp(false);
-    }
-  };
-
   const handleLogout = () => {
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('user_name');
@@ -67,6 +47,53 @@ export const Dashboard: React.FC = () => {
     const m = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
     return `${y}-${m}-${day}`;
+  };
+
+  // Data Dump / Export Modal States
+  const [isBackupModalOpen, setIsBackupModalOpen] = useState(false);
+  const [backupMode, setBackupMode] = useState<'month' | 'custom' | 'all'>('month');
+  const [backupYear, setBackupYear] = useState<number>(currentYear);
+  const [backupMonth, setBackupMonth] = useState<number>(currentDate.getMonth());
+  const [customBackupStart, setCustomBackupStart] = useState<string>(
+    formatDateISO(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1))
+  );
+  const [customBackupEnd, setCustomBackupEnd] = useState<string>(formatDateISO(currentDate));
+
+  const handleExecuteBackup = async () => {
+    setIsBackingUp(true);
+    let sDate = '';
+    let eDate = '';
+    let label = 'all';
+
+    if (backupMode === 'month') {
+      const firstDay = new Date(backupYear, backupMonth, 1);
+      const lastDay = new Date(backupYear, backupMonth + 1, 0);
+      sDate = formatDateISO(firstDay);
+      eDate = formatDateISO(lastDay);
+      label = `${monthLongNames[backupMonth]}_${backupYear}`;
+    } else if (backupMode === 'custom') {
+      sDate = customBackupStart;
+      eDate = customBackupEnd;
+      label = `${customBackupStart}_to_${customBackupEnd}`;
+    }
+
+    try {
+      const blob = await triggerManualBackup(sDate, eDate);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const timestamp = new Date().toISOString().slice(0, 10);
+      a.download = `shivstore_dump_${label}_${timestamp}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      a.remove();
+      setIsBackupModalOpen(false);
+    } catch (err: any) {
+      alert(err.message || 'Failed to generate data dump.');
+    } finally {
+      setIsBackingUp(false);
+    }
   };
 
   const formatDateDisplay = (d: Date): string => {
@@ -407,20 +434,11 @@ export const Dashboard: React.FC = () => {
           <div className="header-actions">
             <button 
               className="btn-backup-manual"
-              onClick={handleManualBackup}
-              disabled={isBackingUp}
+              onClick={() => setIsBackupModalOpen(true)}
+              title="Open Data Dump & Backup Export options"
             >
-              {isBackingUp ? (
-                <>
-                  <Database size={16} className="animate-spin" />
-                  <span>Backing Up...</span>
-                </>
-              ) : (
-                <>
-                  <Download size={16} />
-                  <span>Manual Backup</span>
-                </>
-              )}
+              <Database size={16} />
+              <span>Export Data</span>
             </button>
           </div>
         </header>
@@ -700,6 +718,163 @@ export const Dashboard: React.FC = () => {
 
         </div>
       </main>
+
+      {/* ── Data Dump / Export Modal ─────────────────────────────────────── */}
+      {isBackupModalOpen && (
+        <div className="dump-modal-overlay" onClick={() => setIsBackupModalOpen(false)}>
+          <div className="dump-modal-box" onClick={(e) => e.stopPropagation()}>
+            <div className="dump-modal-header">
+              <div className="dump-modal-title-area">
+                <div className="dump-icon-circle">
+                  <Database size={20} />
+                </div>
+                <div>
+                  <h2>Data Dump & Export</h2>
+                  <p>Select Month or Custom Range to dump database records to Excel</p>
+                </div>
+              </div>
+              <button
+                className="dump-modal-close"
+                onClick={() => setIsBackupModalOpen(false)}
+                aria-label="Close modal"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Mode Selection Tabs */}
+            <div className="dump-modal-tabs">
+              <button
+                className={`dump-tab-btn ${backupMode === 'month' ? 'active' : ''}`}
+                onClick={() => setBackupMode('month')}
+              >
+                Month Dump
+              </button>
+              <button
+                className={`dump-tab-btn ${backupMode === 'custom' ? 'active' : ''}`}
+                onClick={() => setBackupMode('custom')}
+              >
+                Custom Range
+              </button>
+              <button
+                className={`dump-tab-btn ${backupMode === 'all' ? 'active' : ''}`}
+                onClick={() => setBackupMode('all')}
+              >
+                Full Dump (All)
+              </button>
+            </div>
+
+            <div className="dump-modal-body">
+              {backupMode === 'month' && (
+                <div className="dump-month-section">
+                  {/* Year Selection */}
+                  <div className="dump-field-group">
+                    <label className="dump-field-label">Select Year</label>
+                    <div className="dump-year-options">
+                      {[currentYear, currentYear - 1].map((yr) => (
+                        <button
+                          key={yr}
+                          className={`dump-year-btn ${backupYear === yr ? 'selected' : ''}`}
+                          onClick={() => setBackupYear(yr)}
+                        >
+                          {yr}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Month Selection */}
+                  <div className="dump-field-group" style={{ marginTop: '16px' }}>
+                    <label className="dump-field-label">Select Month</label>
+                    <div className="dump-months-grid">
+                      {monthLongNames.map((mName, idx) => (
+                        <button
+                          key={mName}
+                          className={`dump-month-card ${backupMonth === idx ? 'selected' : ''}`}
+                          onClick={() => setBackupMonth(idx)}
+                        >
+                          <span className="dump-month-code">{mName.slice(0, 3)}</span>
+                          <span className="dump-month-full">{mName}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {backupMode === 'custom' && (
+                <div className="dump-custom-section">
+                  <p className="dump-info-text">Select start date and end date to filter and export records.</p>
+                  <div className="dump-date-row">
+                    <div className="dump-date-field">
+                      <label className="dump-field-label">From Date (Start)</label>
+                      <input
+                        type="date"
+                        className="dump-date-input"
+                        value={customBackupStart}
+                        onChange={(e) => setCustomBackupStart(e.target.value)}
+                      />
+                    </div>
+                    <div className="dump-date-field">
+                      <label className="dump-field-label">To Date (End)</label>
+                      <input
+                        type="date"
+                        className="dump-date-input"
+                        value={customBackupEnd}
+                        onChange={(e) => setCustomBackupEnd(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {backupMode === 'all' && (
+                <div className="dump-all-section">
+                  <div className="dump-all-badge">
+                    <Database size={32} style={{ color: '#5c60f5' }} />
+                  </div>
+                  <h3>Full Historical Database Dump</h3>
+                  <p>Export all collections and historical data from database into a single Excel (.xlsx) file.</p>
+                </div>
+              )}
+            </div>
+
+            {/* Footer / Download Action */}
+            <div className="dump-modal-footer">
+              <button
+                className="dump-btn-cancel"
+                onClick={() => setIsBackupModalOpen(false)}
+                disabled={isBackingUp}
+              >
+                Cancel
+              </button>
+              <button
+                className="dump-btn-export"
+                onClick={handleExecuteBackup}
+                disabled={isBackingUp}
+              >
+                {isBackingUp ? (
+                  <>
+                    <Database size={16} className="animate-spin" />
+                    <span>Generating Excel Dump...</span>
+                  </>
+                ) : (
+                  <>
+                    <Download size={16} />
+                    <span>
+                      {backupMode === 'month'
+                        ? `Download ${monthLongNames[backupMonth]} ${backupYear} Dump`
+                        : backupMode === 'custom'
+                        ? 'Download Custom Dump'
+                        : 'Download Full Dump'}
+                    </span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

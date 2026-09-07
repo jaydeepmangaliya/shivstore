@@ -380,8 +380,13 @@ export async function fetchVehicleSummaries(
 }
 
 /** Triggers database backup and downloads the resulting Excel file as a Blob. */
-export async function triggerManualBackup(): Promise<Blob> {
-  const res = await apiFetch(`${API_BASE}/backup/trigger`, {
+export async function triggerManualBackup(startDate?: string, endDate?: string): Promise<Blob> {
+  const params = new URLSearchParams();
+  if (startDate) params.append('startDate', startDate);
+  if (endDate) params.append('endDate', endDate);
+
+  const queryString = params.toString() ? `?${params.toString()}` : '';
+  const res = await apiFetch(`${API_BASE}/backup/trigger${queryString}`, {
     method: 'POST',
   });
   if (!res.ok) {

@@ -39,11 +39,15 @@ public class AdminBackupController {
 
     /**
      * Manually triggers database backup and S3 upload, and returns the backup data as a downloadable Excel (.xlsx) file.
+     * Optionally accepts startDate and endDate to filter export data.
      * Accessible by all authenticated users.
      * Endpoints: GET/POST /api/backup/trigger or /api/backup/manual
      */
     @RequestMapping(value = {"/trigger", "/manual"}, method = {RequestMethod.GET, RequestMethod.POST})
-    public ResponseEntity<?> triggerBackup(Authentication authentication) {
+    public ResponseEntity<?> triggerBackup(
+            Authentication authentication,
+            @RequestParam(value = "startDate", required = false) String startDate,
+            @RequestParam(value = "endDate", required = false) String endDate) {
         if (authentication == null || !authentication.isAuthenticated()) {
             Map<String, String> err = new HashMap<>();
             err.put("error", "Unauthorized - Authentication required");
@@ -55,9 +59,9 @@ public class AdminBackupController {
 
         // 2. Generate and download Excel file
         try {
-            byte[] excelBytes = generateDatabaseExcel();
+            byte[] excelBytes = generateDatabaseExcel(startDate, endDate);
             String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"));
-            String fileName = "shivstore_backup_" + timestamp + ".xlsx";
+            String fileName = "shivstore_dump_" + timestamp + ".xlsx";
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
@@ -99,7 +103,10 @@ public class AdminBackupController {
         return ResponseEntity.ok(status);
     }
 
-    private byte[] generateDatabaseExcel() throws Exception {
+    private byte[] generateDatabaseExcel(String startDateStr, String endDateStr) throws Exception {
+        java.time.LocalDate startLimit = parseFlexibleDate(startDateStr);
+        java.time.LocalDate endLimit = parseFlexibleDate(endDateStr);
+
         try (Workbook workbook = new XSSFWorkbook()) {
             Set<String> collections = mongoTemplate.getCollectionNames();
             for (String colName : collections) {
@@ -108,11 +115,33 @@ public class AdminBackupController {
                 }
 
                 Sheet sheet = workbook.createSheet(colName);
-                List<Document> documents = mongoTemplate.findAll(Document.class, colName);
+                List<Document> rawDocuments = mongoTemplate.findAll(Document.class, colName);
+
+                // Filter documents by date if date range filter is provided
+                List<Document> documents;
+                if (startLimit != null || endLimit != null) {
+                    documents = rawDocuments.stream().filter(doc -> {
+                        Object dateObj = doc.get("date");
+                        if (dateObj == null) dateObj = doc.get("createdAt");
+                        if (dateObj == null) dateObj = doc.get("timestamp");
+                        if (dateObj == null) dateObj = doc.get("created_at");
+
+                        if (dateObj != null) {
+                            java.time.LocalDate docDate = parseFlexibleDate(dateObj);
+                            if (docDate != null) {
+                                if (startLimit != null && docDate.isBefore(startLimit)) return false;
+                                if (endLimit != null && docDate.isAfter(endLimit)) return false;
+                            }
+                        }
+                        return true;
+                    }).toList();
+                } else {
+                    documents = rawDocuments;
+                }
 
                 if (documents.isEmpty()) {
                     Row row = sheet.createRow(0);
-                    row.createCell(0).setCellValue("No data found in this collection");
+                    row.createCell(0).setCellValue("No data found matching criteria in this collection");
                     continue;
                 }
 
@@ -182,5 +211,32 @@ public class AdminBackupController {
             workbook.write(bos);
             return bos.toByteArray();
         }
+    }
+
+    private java.time.LocalDate parseFlexibleDate(Object val) {
+        if (val == null) return null;
+        if (val instanceof java.util.Date dateVal) {
+            return dateVal.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+        }
+        String s = val.toString().trim();
+        if (s.isBlank()) return null;
+        try {
+            if (s.contains("/")) {
+                String[] parts = s.split("/");
+                if (parts.length == 3) {
+                    return java.time.LocalDate.of(Integer.parseInt(parts[2]), Integer.parseInt(parts[1]), Integer.parseInt(parts[0]));
+                }
+            } else if (s.contains("-")) {
+                String[] parts = s.split("-");
+                if (parts.length >= 3) {
+                    if (parts[0].length() == 4) {
+                        return java.time.LocalDate.of(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2].substring(0, Math.min(2, parts[2].length()))));
+                    } else {
+                        return java.time.LocalDate.of(Integer.parseInt(parts[2].substring(0, Math.min(4, parts[2].length()))), Integer.parseInt(parts[1]), Integer.parseInt(parts[0]));
+                    }
+                }
+            }
+        } catch (Exception ignored) {}
+        return null;
     }
 }
