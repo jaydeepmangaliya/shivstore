@@ -137,8 +137,11 @@
 .auth-card-wrapper::before {
   content: '';
   position: absolute;
-  width: 180%;
-  height: 180%;
+  top: 50%;
+  left: 50%;
+  width: 350%;
+  height: 350%;
+  transform: translate(-50%, -50%) rotate(0deg);
   background: conic-gradient(
     from 0deg,
     transparent 65%,
@@ -151,10 +154,10 @@
 
 @keyframes rotateGlow {
   from {
-    transform: rotate(0deg);
+    transform: translate(-50%, -50%) rotate(0deg);
   }
   to {
-    transform: rotate(360deg);
+    transform: translate(-50%, -50%) rotate(360deg);
   }
 }
 
