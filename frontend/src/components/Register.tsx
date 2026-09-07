@@ -3,10 +3,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, User, ArrowRight, CheckCircle } from 'lucide-react';
 import { register } from '../services/api';
 import { useToast } from './Toast';
-import { ParticleCanvas } from './ParticleCanvas';
 import logoImg from '../assets/LOGO.png';
 import './Login.css';
-import './Register.css';
 
 export const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -40,7 +38,6 @@ export const Register: React.FC = () => {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // ── Client-side validation with descriptive toasts ────────────────────
     if (!name.trim()) {
       toast.warning('Name Required', 'Please enter your full name to create an account.');
       return;
@@ -99,215 +96,157 @@ export const Register: React.FC = () => {
     }
   };
 
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 });
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const { innerWidth, innerHeight } = window;
-    const x = (e.clientX - innerWidth / 2) / (innerWidth / 2);
-    const y = (e.clientY - innerHeight / 2) / (innerHeight / 2);
-    setMousePos({ x, y });
-    setCursorPos({ x: e.clientX, y: e.clientY });
-  };
-
   return (
-    <div className="auth-page" onMouseMove={handleMouseMove}>
-      {/* Interactive Background Particle Constellation Canvas */}
-      <ParticleCanvas />
+    <div className="auth-page">
+      {/* Blueprint Geometric Background Circles & Glow Blobs */}
+      <div className="blueprint-circle blueprint-circle-1" />
+      <div className="blueprint-circle blueprint-circle-2" />
+      <div className="blueprint-circle blueprint-circle-3" />
+      <div className="blueprint-glow-blob blueprint-glow-blob-1" />
+      <div className="blueprint-glow-blob blueprint-glow-blob-2" />
 
-      {/* Dynamic Cursor Spotlight Follower */}
-      <div
-        className="auth-mouse-spotlight"
-        style={{
-          left: `${cursorPos.x}px`,
-          top: `${cursorPos.y}px`,
-        }}
-      />
-      <div
-        className="auth-mouse-dot"
-        style={{
-          left: `${cursorPos.x}px`,
-          top: `${cursorPos.y}px`,
-        }}
-      />
-
-      {/* Background Effects */}
-      <div className="auth-bg-gradient" />
-      <div className="auth-grid-overlay" />
-      <div
-        className="auth-orb auth-orb-1"
-        style={{
-          transform: `translate(${mousePos.x * 45}px, ${mousePos.y * 45}px)`,
-        }}
-      />
-      <div
-        className="auth-orb auth-orb-2"
-        style={{
-          transform: `translate(${mousePos.x * -55}px, ${mousePos.y * -55}px)`,
-        }}
-      />
-      <div
-        className="auth-orb auth-orb-3"
-        style={{
-          transform: `translate(${mousePos.x * 35}px, ${mousePos.y * -35}px)`,
-        }}
-      />
-
-      {/* Brand Panel — Left Side */}
-      <div className="auth-brand-panel">
-        <div className="auth-brand-content">
-          <div className="auth-brand-logo">
-            <img src={logoImg} alt="Shiv Stone Crusher Logo" />
-          </div>
-          <h1 className="auth-brand-title">SHIV STONE</h1>
-          <p className="auth-brand-tagline">
-            Create your account to start managing gate passes, billing, and analytics.
-          </p>
-        </div>
-      </div>
-
-      {/* Form Panel — Right Side */}
-      <div className="auth-form-panel">
-        <div className="auth-card">
-          {/* Dynamic Specular Light Shine Reflection */}
-          <div
-            className="auth-card-shine"
-            style={{
-              background: `radial-gradient(circle at ${((mousePos.x + 1) * 50).toFixed(1)}% ${((mousePos.y + 1) * 50).toFixed(1)}%, rgba(255, 255, 255, 0.16) 0%, rgba(99, 102, 241, 0.06) 45%, transparent 70%)`,
-            }}
-          />
-
-          <div className="auth-card-header">
-            <h2 className="auth-card-title">Create Account</h2>
-            <p className="auth-card-subtitle">Join SHIVSTORE Management System</p>
-          </div>
-
-          <form className="auth-form auth-form--register" onSubmit={handleRegister}>
-            {/* Full Name */}
-            <div className="auth-input-group">
-              <label htmlFor="reg-name" className="auth-input-label">Full Name</label>
-              <div className="auth-input-wrapper">
-                <User size={18} className="auth-input-icon" />
-                <input
-                  id="reg-name"
-                  type="text"
-                  className="auth-input"
-                  placeholder="Enter your full name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  autoComplete="name"
-                />
+      <div className="auth-container">
+        {/* Animated Light Border Card Wrapper */}
+        <div className="auth-card-wrapper">
+          <div className="auth-card">
+            {/* Logo & Brand Header */}
+            <div className="auth-card-brand">
+              <div className="auth-brand-logo">
+                <img src={logoImg} alt="Shiv Stone Crusher Logo" />
               </div>
+              <h1 className="auth-brand-title">SHIV STONE</h1>
+              <p className="auth-brand-tagline">Create your account to access your dashboard</p>
             </div>
 
-            {/* Email */}
-            <div className="auth-input-group">
-              <label htmlFor="reg-email" className="auth-input-label">Email Address</label>
-              <div className="auth-input-wrapper">
-                <Mail size={18} className="auth-input-icon" />
-                <input
-                  id="reg-email"
-                  type="email"
-                  className="auth-input"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  autoComplete="email"
-                />
-              </div>
-            </div>
+            <div className="auth-card-divider" />
 
-            {/* Password */}
-            <div className="auth-input-group">
-              <label htmlFor="reg-password" className="auth-input-label">Password</label>
-              <div className="auth-input-wrapper">
-                <Lock size={18} className="auth-input-icon" />
-                <input
-                  id="reg-password"
-                  type={showPassword ? 'text' : 'password'}
-                  className="auth-input"
-                  placeholder="At least 6 characters"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  autoComplete="new-password"
-                />
-                <button
-                  type="button"
-                  className="auth-toggle-pw-btn"
-                  onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
-
-              {/* Strength meter */}
-              {password.length > 0 && (
-                <div className="auth-strength-meter">
-                  <div className="auth-strength-bars">
-                    {[1, 2, 3, 4, 5].map((i) => (
-                      <div
-                        key={i}
-                        className={`auth-strength-bar${i <= strength.level ? ' active' : ''}`}
-                        style={{
-                          background: i <= strength.level ? strength.color : undefined,
-                        }}
-                      />
-                    ))}
-                  </div>
-                  <span className="auth-strength-label" style={{ color: strength.color }}>
-                    {strength.label}
-                  </span>
+            <form className="auth-form" onSubmit={handleRegister}>
+              {/* Full Name */}
+              <div className="auth-input-group">
+                <label htmlFor="reg-name" className="auth-input-label">Full Name</label>
+                <div className="auth-input-wrapper">
+                  <User size={16} className="auth-input-icon" />
+                  <input
+                    id="reg-name"
+                    type="text"
+                    className="auth-input"
+                    placeholder="Enter your full name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    autoComplete="name"
+                  />
                 </div>
-              )}
-            </div>
+              </div>
 
-            {/* Confirm Password */}
-            <div className="auth-input-group">
-              <label htmlFor="reg-confirm-password" className="auth-input-label">Confirm Password</label>
-              <div className="auth-input-wrapper">
-                <Lock size={18} className="auth-input-icon" />
-                <input
-                  id="reg-confirm-password"
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  className="auth-input"
-                  placeholder="Re-enter your password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  autoComplete="new-password"
-                />
-                <button
-                  type="button"
-                  className="auth-toggle-pw-btn"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
-                >
-                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-                {confirmPassword.length > 0 && password === confirmPassword && (
-                  <CheckCircle size={18} className="auth-confirm-check" />
+              {/* Email */}
+              <div className="auth-input-group">
+                <label htmlFor="reg-email" className="auth-input-label">Email Address</label>
+                <div className="auth-input-wrapper">
+                  <Mail size={16} className="auth-input-icon" />
+                  <input
+                    id="reg-email"
+                    type="email"
+                    className="auth-input"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    autoComplete="email"
+                  />
+                </div>
+              </div>
+
+              {/* Password */}
+              <div className="auth-input-group">
+                <label htmlFor="reg-password" className="auth-input-label">Password</label>
+                <div className="auth-input-wrapper">
+                  <Lock size={16} className="auth-input-icon" />
+                  <input
+                    id="reg-password"
+                    type={showPassword ? 'text' : 'password'}
+                    className="auth-input"
+                    placeholder="At least 6 characters"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    autoComplete="new-password"
+                  />
+                  <button
+                    type="button"
+                    className="auth-toggle-pw-btn"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+
+                {/* Strength meter */}
+                {password.length > 0 && (
+                  <div className="auth-strength-meter">
+                    <div className="auth-strength-bars">
+                      {[1, 2, 3, 4, 5].map((i) => (
+                        <div
+                          key={i}
+                          className={`auth-strength-bar${i <= strength.level ? ' active' : ''}`}
+                          style={{
+                            background: i <= strength.level ? strength.color : undefined,
+                          }}
+                        />
+                      ))}
+                    </div>
+                    <span className="auth-strength-label" style={{ color: strength.color }}>
+                      {strength.label}
+                    </span>
+                  </div>
                 )}
               </div>
+
+              {/* Confirm Password */}
+              <div className="auth-input-group">
+                <label htmlFor="reg-confirm-password" className="auth-input-label">Confirm Password</label>
+                <div className="auth-input-wrapper">
+                  <Lock size={16} className="auth-input-icon" />
+                  <input
+                    id="reg-confirm-password"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    className="auth-input"
+                    placeholder="Re-enter your password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    autoComplete="new-password"
+                  />
+                  <button
+                    type="button"
+                    className="auth-toggle-pw-btn"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                  {confirmPassword.length > 0 && password === confirmPassword && (
+                    <CheckCircle size={16} className="auth-confirm-check" />
+                  )}
+                </div>
+              </div>
+
+              <button type="submit" className="auth-submit-btn" disabled={isLoading}>
+                {isLoading ? (
+                  <span className="auth-spinner">Creating account...</span>
+                ) : (
+                  <>
+                    <span>Create Account</span>
+                    <ArrowRight size={16} />
+                  </>
+                )}
+              </button>
+            </form>
+
+            <div className="auth-footer" style={{ marginTop: 24 }}>
+              <p className="auth-footer-text">
+                Already have an account?{' '}
+                <Link to="/login" className="auth-footer-link">Sign in</Link>
+              </p>
+              <p className="auth-footer-copyright">© 2026 SHIV STONE. All rights reserved.</p>
             </div>
-
-            <button type="submit" className="auth-submit-btn" disabled={isLoading}>
-              {isLoading ? (
-                <span className="auth-spinner">Creating account...</span>
-              ) : (
-                <>
-                  <span>Create Account</span>
-                  <ArrowRight size={18} />
-                </>
-              )}
-            </button>
-          </form>
-
-          <div className="auth-footer">
-            <p className="auth-footer-text">
-              Already have an account?{' '}
-              <Link to="/login" className="auth-footer-link">Sign in</Link>
-            </p>
-            <p className="auth-footer-copyright">© 2026 SHIV STONE. All rights reserved.</p>
           </div>
         </div>
       </div>
