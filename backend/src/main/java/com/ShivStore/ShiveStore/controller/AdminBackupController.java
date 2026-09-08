@@ -3,6 +3,7 @@ package com.ShivStore.ShiveStore.controller;
 import com.ShivStore.ShiveStore.service.DatabaseBackupService;
 import com.ShivStore.ShiveStore.service.S3StorageService;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -299,6 +300,13 @@ public class AdminBackupController {
         dataStyle.setBorderLeft(BorderStyle.THIN);
         dataStyle.setBorderRight(BorderStyle.THIN);
 
+        CellStyle centerDataStyle = workbook.createCellStyle();
+        centerDataStyle.setBorderTop(BorderStyle.THIN);
+        centerDataStyle.setBorderBottom(BorderStyle.THIN);
+        centerDataStyle.setBorderLeft(BorderStyle.THIN);
+        centerDataStyle.setBorderRight(BorderStyle.THIN);
+        centerDataStyle.setAlignment(HorizontalAlignment.CENTER);
+
         CellStyle totalRowStyle = workbook.createCellStyle();
         totalRowStyle.setFont(boldFont);
         totalRowStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
@@ -315,23 +323,26 @@ public class AdminBackupController {
             String partyName = entry.getKey();
             List<Document> partyPasses = entry.getValue();
 
-            // Header Row 1: Company Title
+            // Header Row 1: Company Title (Merged across all columns)
             Row rTitle = sheet.createRow(currentRow++);
             Cell cTitle = rTitle.createCell(0);
             cTitle.setCellValue("SHIV STONE CRUSHER MOTA GUNDA");
             cTitle.setCellStyle(companyHeaderStyle);
+            sheet.addMergedRegion(new CellRangeAddress(rTitle.getRowNum(), rTitle.getRowNum(), 0, totalCols - 1));
 
-            // Header Row 2: Mobile Numbers
+            // Header Row 2: Mobile Numbers (Merged across all columns)
             Row rContact = sheet.createRow(currentRow++);
             Cell cContact = rContact.createCell(0);
             cContact.setCellValue("MOBILE NUMBER :- 9712944133           MOBILE NUMBER :- 9979844133");
             cContact.setCellStyle(contactHeaderStyle);
+            sheet.addMergedRegion(new CellRangeAddress(rContact.getRowNum(), rContact.getRowNum(), 0, totalCols - 1));
 
-            // Header Row 3: Purchaser Name
+            // Header Row 3: Purchaser Name (Merged across all columns)
             Row rPurchaser = sheet.createRow(currentRow++);
             Cell cPurchaser = rPurchaser.createCell(0);
             cPurchaser.setCellValue("PURCHASER :- " + partyName.toUpperCase());
             cPurchaser.setCellStyle(purchaserStyle);
+            sheet.addMergedRegion(new CellRangeAddress(rPurchaser.getRowNum(), rPurchaser.getRowNum(), 0, totalCols - 1));
 
             // Header Row 4: Table Headers
             Row rHeader = sheet.createRow(currentRow++);
@@ -366,25 +377,25 @@ public class AdminBackupController {
                 // SIR NO
                 Cell cellSir = rData.createCell(0);
                 cellSir.setCellValue(sirNo++);
-                cellSir.setCellStyle(dataStyle);
+                cellSir.setCellStyle(centerDataStyle);
 
                 // DATE
                 Cell cellDate = rData.createCell(1);
                 Object d = passDoc.get("date");
                 cellDate.setCellValue(d != null ? d.toString() : "");
-                cellDate.setCellStyle(dataStyle);
+                cellDate.setCellStyle(centerDataStyle);
 
                 // VEHICLE NO
                 Cell cellVeh = rData.createCell(2);
                 Object v = passDoc.get("vehicleNumber");
                 cellVeh.setCellValue(v != null ? v.toString() : "");
-                cellVeh.setCellStyle(dataStyle);
+                cellVeh.setCellStyle(centerDataStyle);
 
                 // ROYALTY NO
                 Cell cellRoyalty = rData.createCell(3);
                 Object passNoObj = passDoc.get("passNo");
                 cellRoyalty.setCellValue(passNoObj != null ? "#" + passNoObj.toString() : "");
-                cellRoyalty.setCellStyle(dataStyle);
+                cellRoyalty.setCellStyle(centerDataStyle);
 
                 // Material Matching
                 String passMat = passDoc.getString("materials");
@@ -430,7 +441,7 @@ public class AdminBackupController {
                 grandNetTons += netTons;
             }
 
-            // Total Summary Row
+            // Total Summary Row (Merged label across columns 0 to 3)
             Row rTotal = sheet.createRow(currentRow++);
             Cell cTotLabel = rTotal.createCell(0);
             cTotLabel.setCellValue("TOTAL TON / WEIGHT :-");
@@ -440,6 +451,7 @@ public class AdminBackupController {
                 Cell cellEmpty = rTotal.createCell(i);
                 cellEmpty.setCellStyle(totalRowStyle);
             }
+            sheet.addMergedRegion(new CellRangeAddress(rTotal.getRowNum(), rTotal.getRowNum(), 0, 3));
 
             for (int m = 0; m < materialsList.size(); m++) {
                 Cell cellMatTot = rTotal.createCell(4 + m);
@@ -459,10 +471,18 @@ public class AdminBackupController {
             currentRow += 2;
         }
 
-        // Auto-size columns
+        // Auto-size columns with balanced width bounds
         for (int col = 0; col < totalCols; col++) {
             try {
                 sheet.autoSizeColumn(col);
+                int autoWidth = sheet.getColumnWidth(col);
+                if (col == 0) { // SIR NO column: compact width (~8-10 chars)
+                    sheet.setColumnWidth(col, Math.min(autoWidth + 256, 9 * 256));
+                } else if (col <= 3) { // Date, Vehicle, Royalty columns (~14 chars)
+                    sheet.setColumnWidth(col, Math.max(autoWidth + 512, 14 * 256));
+                } else { // Material & Net weight columns (~11 chars)
+                    sheet.setColumnWidth(col, Math.max(autoWidth + 256, 11 * 256));
+                }
             } catch (Exception ignored) {}
         }
     }
