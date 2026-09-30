@@ -263,7 +263,7 @@ public class AdminBackupController {
             partyMap.computeIfAbsent(pName, k -> new ArrayList<>()).add(doc);
         }
 
-        List<String> materialsList = List.of("10 MM", "20 MM", "6 MM", "40 MM", "65 MM", "POWDER", "GSB", "DUST", "STONE CHIPS", "OTHERS");
+        List<String> materialsList = List.of("10 MM", "20 MM", "6 MM", "40 MM", "65 MM", "POWDER", "GSB", "DUST", "GRIT", "STONE CHIPS", "WMM", "RUBBLE", "OTHERS");
 
         // Cell Styles
         Font titleFont = workbook.createFont();
@@ -399,7 +399,9 @@ public class AdminBackupController {
 
                 // Material Matching
                 String passMat = passDoc.getString("materials");
-                String passMatNorm = passMat != null ? passMat.trim().toUpperCase() : "";
+                if (passMat == null || passMat.isBlank()) {
+                    passMat = passDoc.getString("material");
+                }
 
                 Double netWeightVal = passDoc.getDouble("netWeight");
                 if (netWeightVal == null && passDoc.get("netWeight") instanceof Number num) {
@@ -418,8 +420,7 @@ public class AdminBackupController {
                     cellMat.setCellStyle(dataStyle);
 
                     String targetMat = materialsList.get(m);
-                    boolean isMatch = passMatNorm.equalsIgnoreCase(targetMat) || 
-                                     ("OTHERS".equals(targetMat) && materialsList.stream().noneMatch(passMatNorm::equalsIgnoreCase));
+                    boolean isMatch = isMaterialMatch(passMat, targetMat, materialsList);
 
                     if (isMatch) {
                         cellMat.setCellValue(netWeight);
@@ -691,5 +692,26 @@ public class AdminBackupController {
             }
         } catch (Exception ignored) {}
         return null;
+    }
+
+    private boolean isMaterialMatch(String passMat, String targetMat, List<String> allTargets) {
+        if (passMat == null || passMat.isBlank()) {
+            return "OTHERS".equalsIgnoreCase(targetMat);
+        }
+        String normPass = passMat.replaceAll("\\s+", "").toUpperCase();
+        String normTarget = targetMat.replaceAll("\\s+", "").toUpperCase();
+
+        if ("OTHERS".equalsIgnoreCase(targetMat)) {
+            for (String otherTarget : allTargets) {
+                if ("OTHERS".equalsIgnoreCase(otherTarget)) continue;
+                String normOther = otherTarget.replaceAll("\\s+", "").toUpperCase();
+                if (normPass.equalsIgnoreCase(normOther)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        return normPass.equalsIgnoreCase(normTarget);
     }
 }

@@ -44,6 +44,28 @@ function parseDMY(dateStr: string): Date | null {
   return null;
 }
 
+const isMaterialMatch = (recMat: string, targetMat: string, allMaterials: string[]): boolean => {
+  const normPass = (recMat || '').replace(/\s+/g, '').toUpperCase();
+  const normTarget = (targetMat || '').replace(/\s+/g, '').toUpperCase();
+
+  if (!normPass) {
+    return normTarget === 'OTHERS';
+  }
+
+  if (normTarget === 'OTHERS') {
+    for (const otherTarget of allMaterials) {
+      if (otherTarget.toUpperCase() === 'OTHERS') continue;
+      const normOther = otherTarget.replace(/\s+/g, '').toUpperCase();
+      if (normPass === normOther) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  return normPass === normTarget;
+};
+
 function formatDisplayDate(dateStr: string): string {
   const d = parseDMY(dateStr);
   if (!d) return dateStr;
@@ -310,16 +332,20 @@ export const PartyOverview: React.FC = () => {
 
   // Distinct materials extracted from filtered records (ensuring standard stone crusher columns)
   const statementMaterials = React.useMemo(() => {
-    const defaultCols = ['10 MM', '20 MM', '6 MM', '40 MM', '65 MM', 'POWDER', 'GSB'];
+    const defaultCols = ['10 MM', '20 MM', '6 MM', '40 MM', '65 MM', 'POWDER', 'GSB', 'DUST', 'STONE CHIPS', 'OTHERS'];
     const set = new Set<string>();
+    defaultCols.forEach(c => set.add(c));
     billRecords.forEach(r => {
       if (r.materials && r.materials.trim()) {
-        set.add(r.materials.trim().toUpperCase());
+        const normPass = r.materials.replace(/\s+/g, '').toUpperCase();
+        const matchesDefault = defaultCols.some(c => c.replace(/\s+/g, '').toUpperCase() === normPass);
+        if (!matchesDefault) {
+          set.add(r.materials.trim().toUpperCase());
+        }
       }
     });
-    defaultCols.forEach(c => set.add(c));
     const list = Array.from(set);
-    const order = ['10 MM', '20 MM', '6 MM', '40 MM', '65 MM', 'POWDER', 'DUST', 'GSB', 'WMM', 'RUBBLE', 'STONE CHIPS'];
+    const order = ['10 MM', '20 MM', '6 MM', '40 MM', '65 MM', 'POWDER', 'GSB', 'DUST', 'GRIT', 'STONE CHIPS', 'WMM', 'RUBBLE', 'OTHERS'];
     list.sort((a, b) => {
       const ia = order.indexOf(a);
       const ib = order.indexOf(b);
@@ -338,10 +364,11 @@ export const PartyOverview: React.FC = () => {
       totals[m] = 0;
     });
     billRecords.forEach(r => {
-      const mat = (r.materials || '').trim().toUpperCase();
-      if (totals[mat] !== undefined) {
-        totals[mat] += r.netWeight;
-      }
+      statementMaterials.forEach(m => {
+        if (isMaterialMatch(r.materials || '', m, statementMaterials)) {
+          totals[m] += r.netWeight;
+        }
+      });
     });
     return totals;
   }, [billRecords, statementMaterials]);
@@ -932,7 +959,6 @@ export const PartyOverview: React.FC = () => {
                         ) : (
                           billRecords.map((r, idx) => {
                             const passDate = r.date ? r.date.replace(/\//g, '-') : '';
-                            const recMat = (r.materials || '').trim().toUpperCase();
                             return (
                               <tr key={r.id || r.no || idx} className="po-challan-data-row">
                                 <td className="cell-center">{idx + 1}</td>
@@ -940,7 +966,7 @@ export const PartyOverview: React.FC = () => {
                                 <td className="cell-center cell-veh-num">{r.vehicleNumber}</td>
                                 <td className="cell-center">{r.no ? `#${r.no}` : '-'}</td>
                                 {statementMaterials.map((mat, mIdx) => {
-                                  const isMatch = recMat === mat;
+                                  const isMatch = isMaterialMatch(r.materials || '', mat, statementMaterials);
                                   return (
                                     <td key={mIdx} className="cell-weight">
                                       {isMatch ? r.netWeight.toLocaleString('en-IN') : ''}
